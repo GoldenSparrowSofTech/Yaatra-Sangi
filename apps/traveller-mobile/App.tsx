@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image, ImageBackground, TouchableOpacity, StatusBar, TextInput, ActivityIndicator, Platform, Linking, Alert, BackHandler, Modal } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { io, Socket } from 'socket.io-client';
-
+import { WebView } from 'react-native-webview';
 const isWeb = Platform.OS === 'web';
 
 // --- TYPES ---
@@ -879,26 +879,59 @@ const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string) => v
 
         {/* RIGHT PANEL (Map View & Results) */}
         <View style={{ flex: Platform.OS === 'web' ? 0.65 : 1, backgroundColor: '#e5e5e5', position: 'relative' }}>
-           {/* Fallback Map Image */}
-           <ImageBackground 
-             source={{ uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80' }} 
+           <WebView
+             originWhitelist={['*']}
+             source={{ html: `
+               <!DOCTYPE html>
+               <html>
+               <head>
+                 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+                 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+                 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+                 <style>
+                   body { padding: 0; margin: 0; }
+                   html, body, #map { height: 100%; width: 100vw; background: #0f172a; }
+                 </style>
+               </head>
+               <body>
+                 <div id="map"></div>
+                 <script>
+                   var map = L.map('map', { zoomControl: false }).setView([22.5, 75.0], 6);
+                   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                     attribution: 'Map data &copy; OpenStreetMap contributors'
+                   }).addTo(map);
+
+                   var markers = ${JSON.stringify(cities)};
+                   
+                   if (markers.length > 0) {
+                     var latlngs = markers.map(function(m) { return [parseFloat(m.lat), parseFloat(m.lon)]; });
+                     var bounds = L.latLngBounds(latlngs);
+                     
+                     markers.forEach(function(m) {
+                       L.marker([parseFloat(m.lat), parseFloat(m.lon)]).addTo(map).bindPopup(m.name);
+                     });
+
+                     if (latlngs.length > 1) {
+                       L.polyline(latlngs, { color: '#4f46e5', weight: 4, dashArray: '10, 10' }).addTo(map);
+                     }
+                     
+                     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+                   }
+                 </script>
+               </body>
+               </html>
+             ` }}
              style={{ flex: 1, width: '100%', height: '100%' }}
-             imageStyle={{ opacity: 0.8 }}
-           >
-             <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: 'rgba(255,255,255,0.7)', alignItems: 'center', justifyContent: routeResult ? 'flex-end' : 'center', paddingBottom: 20, paddingTop: 20 }}>
-               <Text style={{ fontSize: 50, marginBottom: 10 }}>🗺️</Text>
-               <Text style={{ color: '#333', fontWeight: 'bold', fontSize: 18, backgroundColor: 'white', padding: 10, borderRadius: 10, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, textAlign: 'center' }}>
-                 {cities.map(c => c.name).join(' ┈➤ ')}
-               </Text>
-               
-               {/* Mobile Route Optimized Card */}
-               {routeResult && (
-                 <View style={{ marginTop: 20, backgroundColor: '#0f172a', padding: 25, borderRadius: 16, width: '90%', maxWidth: 400, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
-                   <View style={{ width: 48, height: 48, backgroundColor: 'rgba(16, 185, 129, 0.2)', borderRadius: 24, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 15 }}>
-                     <Text style={{ color: '#34d399', fontSize: 24 }}>✓</Text>
-                   </View>
-                   <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>Route Optimized!</Text>
-                   <Text style={{ color: '#94a3b8', fontSize: 14, textAlign: 'center', marginBottom: 25 }}>Best path for {routeResult.stops} locations.</Text>
+           />
+
+           {routeResult && (
+             <View style={{ position: 'absolute', bottom: 0, width: '100%', padding: 20, alignItems: 'center' }}>
+               <View style={{ backgroundColor: '#0f172a', padding: 25, borderRadius: 16, width: '100%', maxWidth: 400, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
+                 <View style={{ width: 48, height: 48, backgroundColor: 'rgba(16, 185, 129, 0.2)', borderRadius: 24, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 15 }}>
+                   <Text style={{ color: '#34d399', fontSize: 24 }}>✓</Text>
+                 </View>
+                 <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>Route Optimized!</Text>
+                 <Text style={{ color: '#94a3b8', fontSize: 14, textAlign: 'center', marginBottom: 25 }}>Best path for {routeResult.stops} locations.</Text>
                    
                    <View style={{ marginBottom: 25 }}>
                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 12, marginBottom: 12 }}>
@@ -926,13 +959,12 @@ const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string) => v
                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Open in Google Maps</Text>
                    </TouchableOpacity>
 
-                   <TouchableOpacity onPress={() => setRouteResult(null)} style={{ marginTop: 15, paddingVertical: 10, alignItems: 'center' }}>
-                     <Text style={{ color: '#94a3b8', fontSize: 14 }}>Close & Edit Route</Text>
-                   </TouchableOpacity>
-                 </View>
-               )}
-             </ScrollView>
-           </ImageBackground>
+                 <TouchableOpacity onPress={() => setRouteResult(null)} style={{ marginTop: 15, paddingVertical: 10, alignItems: 'center' }}>
+                   <Text style={{ color: '#94a3b8', fontSize: 14 }}>Close & Edit Route</Text>
+                 </TouchableOpacity>
+               </View>
+             </View>
+           )}
         </View>
         
       </View>
