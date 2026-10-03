@@ -1335,6 +1335,7 @@ const PartnerDashboardScreen = () => {
             </View>
           )}
         </View>
+      </View>
 
       <View style={{ paddingHorizontal: 20 }}>
         <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 15 }}>Pricing Structure (After Trial)</Text>
