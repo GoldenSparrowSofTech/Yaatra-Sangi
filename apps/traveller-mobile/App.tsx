@@ -1232,6 +1232,44 @@ const LocalRidesScreen = () => {
 const PartnerDashboardScreen = () => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [assets, setAssets] = useState<any[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [incomingRides, setIncomingRides] = useState<any[]>([]);
+  const [vendorId] = useState('driver-mobile-001');
+
+  useEffect(() => {
+    const apiUrl = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
+    const newSocket = io(apiUrl);
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('Mobile Partner connected to WebSocket');
+      newSocket.emit('driver_online', { driverId: vendorId });
+    });
+
+    newSocket.on('new_ride_request', (ride) => {
+      console.log('New ride received in mobile app:', ride);
+      setIncomingRides(prev => [...prev, ride]);
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [vendorId]);
+
+  const acceptRide = (bookingId: string) => {
+    if (socket) {
+      socket.emit('accept_ride', { bookingId, driverId: vendorId });
+      
+      socket.once('ride_accepted_success', (confirmedBooking) => {
+        Alert.alert('Success', 'You successfully accepted the ride!');
+        setIncomingRides(prev => prev.filter(r => r.id !== bookingId));
+      });
+      socket.once('ride_accepted_failed', (data) => {
+        Alert.alert('Failed', 'Failed to accept: ' + data.message);
+        setIncomingRides(prev => prev.filter(r => r.id !== bookingId));
+      });
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -1247,6 +1285,56 @@ const PartnerDashboardScreen = () => {
           <Text style={{ color: '#a7f3d0', fontSize: 13, lineHeight: 20 }}>Enjoy zero commission and unlimited access. Billing of ₹XYZ starts automatically after 90 days.</Text>
         </View>
       </View>
+
+      <View style={{ paddingHorizontal: 20 }}>
+        {/* Real-time Ride Requests */}
+        <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#1e293b', marginBottom: 20 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 10 }}>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Live Ride Requests</Text>
+            <View style={{ backgroundColor: '#1e293b', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
+              <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: 'bold' }}>Searching...</Text>
+            </View>
+          </View>
+
+          {incomingRides.length === 0 ? (
+            <View style={{ alignItems: 'center', paddingVertical: 30 }}>
+              <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+              <Text style={{ color: '#94a3b8', textAlign: 'center' }}>No new ride requests right now.</Text>
+              <Text style={{ color: '#64748b', textAlign: 'center', fontSize: 12, marginTop: 5 }}>Keep this page open to receive live bookings.</Text>
+            </View>
+          ) : (
+            <View style={{ gap: 15 }}>
+              {incomingRides.map(ride => (
+                <View key={ride.id} style={{ backgroundColor: '#020617', borderRadius: 12, padding: 15, borderWidth: 1, borderColor: 'rgba(234, 179, 8, 0.3)' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <View style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                      <Text style={{ color: '#eab308', fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase' }}>New Request</Text>
+                    </View>
+                    <Text style={{ color: '#64748b', fontSize: 12 }}>Just now</Text>
+                  </View>
+                  
+                  <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 5 }}>🟢 {ride.pickup}</Text>
+                  <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 15 }}>📍 {ride.drop}</Text>
+                  
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity 
+                      onPress={() => acceptRide(ride.id)}
+                      style={{ flex: 1, backgroundColor: '#eab308', paddingVertical: 10, borderRadius: 8, alignItems: 'center' }}
+                    >
+                      <Text style={{ color: '#020617', fontWeight: 'bold' }}>Accept Ride</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      onPress={() => setIncomingRides(prev => prev.filter(r => r.id !== ride.id))}
+                      style={{ flex: 1, backgroundColor: '#1e293b', paddingVertical: 10, borderRadius: 8, alignItems: 'center' }}
+                    >
+                      <Text style={{ color: 'white', fontWeight: 'bold' }}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
 
       <View style={{ paddingHorizontal: 20 }}>
         <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 15 }}>Pricing Structure (After Trial)</Text>
@@ -1494,105 +1582,6 @@ const PartnerLoginScreen = ({ onLogin }: { onLogin: () => void }) => {
   );
 };
 
-const PartnerDashboardScreen = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [incomingRides, setIncomingRides] = useState<any[]>([]);
-  const [vendorId] = useState('driver-mobile-001'); // Mock vendor ID
-
-  useEffect(() => {
-    const apiUrl = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
-    const newSocket = io(apiUrl);
-    setSocket(newSocket);
-
-    newSocket.on('connect', () => {
-      console.log('Mobile Partner connected to WebSocket');
-      newSocket.emit('driver_online', { driverId: vendorId });
-    });
-
-    newSocket.on('new_ride_request', (ride) => {
-      console.log('New ride received in mobile app:', ride);
-      setIncomingRides(prev => [...prev, ride]);
-    });
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [vendorId]);
-
-  const acceptRide = (bookingId: string) => {
-    if (socket) {
-      socket.emit('accept_ride', { bookingId, driverId: vendorId });
-      
-      socket.once('ride_accepted_success', (confirmedBooking) => {
-        Alert.alert('Success', 'You successfully accepted the ride!');
-        setIncomingRides(prev => prev.filter(r => r.id !== bookingId));
-      });
-      socket.once('ride_accepted_failed', (data) => {
-        Alert.alert('Failed', 'Failed to accept: ' + data.message);
-        setIncomingRides(prev => prev.filter(r => r.id !== bookingId));
-      });
-    }
-  };
-
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Partner <Text style={styles.textEmerald}>Dashboard</Text> 💼</Text>
-        <Text style={{ color: '#94a3b8', fontSize: 14, marginTop: 5 }}>Manage your rides and requests.</Text>
-      </View>
-
-      <View style={{ paddingHorizontal: 20 }}>
-        <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#1e293b', marginBottom: 20 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 10 }}>
-            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Live Ride Requests</Text>
-            <View style={{ backgroundColor: '#1e293b', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
-              <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: 'bold' }}>Searching...</Text>
-            </View>
-          </View>
-
-          {incomingRides.length === 0 ? (
-            <View style={{ alignItems: 'center', paddingVertical: 30 }}>
-              <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
-              <Text style={{ color: '#94a3b8', textAlign: 'center' }}>No new ride requests right now.</Text>
-              <Text style={{ color: '#64748b', textAlign: 'center', fontSize: 12, marginTop: 5 }}>Keep this page open to receive live bookings.</Text>
-            </View>
-          ) : (
-            <View style={{ gap: 15 }}>
-              {incomingRides.map(ride => (
-                <View key={ride.id} style={{ backgroundColor: '#020617', borderRadius: 12, padding: 15, borderWidth: 1, borderColor: 'rgba(234, 179, 8, 0.3)' }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <View style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
-                      <Text style={{ color: '#eab308', fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase' }}>New Request</Text>
-                    </View>
-                    <Text style={{ color: '#64748b', fontSize: 12 }}>Just now</Text>
-                  </View>
-                  
-                  <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 5 }}>🟢 {ride.pickup}</Text>
-                  <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 15 }}>📍 {ride.drop}</Text>
-                  
-                  <View style={{ flexDirection: 'row', gap: 10 }}>
-                    <TouchableOpacity 
-                      onPress={() => acceptRide(ride.id)}
-                      style={{ flex: 1, backgroundColor: '#eab308', paddingVertical: 10, borderRadius: 8, alignItems: 'center' }}
-                    >
-                      <Text style={{ color: '#020617', fontWeight: 'bold' }}>Accept Ride</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      onPress={() => setIncomingRides(prev => prev.filter(r => r.id !== ride.id))}
-                      style={{ flex: 1, backgroundColor: '#1e293b', paddingVertical: 10, borderRadius: 8, alignItems: 'center' }}
-                    >
-                      <Text style={{ color: 'white', fontWeight: 'bold' }}>Decline</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-      </View>
-    </ScrollView>
-  );
-};
 
 const TravelerDashboardScreen = ({ user, onPlanTrip }: { user: any, onPlanTrip: () => void }) => {
   return (
