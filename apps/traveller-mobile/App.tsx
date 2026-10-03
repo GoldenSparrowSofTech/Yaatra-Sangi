@@ -838,44 +838,85 @@ const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string) => v
           <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', marginBottom: 5 }}>Build Itinerary</Text>
           <Text style={{ color: '#a3a3a3', fontSize: 13, marginBottom: 30 }}>Add cities and let our AI optimize the route.</Text>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {cities.map((city, idx) => (
-              <View key={idx} style={{ marginBottom: 15 }}>
-                <Text style={{ color: '#6366f1', fontSize: 10, fontWeight: 'bold', letterSpacing: 1, marginBottom: 5, textTransform: 'uppercase' }}>
-                  {idx === 0 ? 'STARTING POINT' : `STOP ${idx}`}
-                </Text>
-                <View style={{ flexDirection: 'row', backgroundColor: '#171717', borderRadius: 8, borderWidth: 1, borderColor: '#262626', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 12 }}>
-                  <Text style={{ color: 'white', flex: 1, fontWeight: '600' }}>{city.name}</Text>
-                  {idx > 0 && (
-                    <TouchableOpacity onPress={() => removeCity(idx)}>
-                      <Text style={{ color: '#525252', fontWeight: 'bold', fontSize: 16 }}>×</Text>
-                    </TouchableOpacity>
-                  )}
+          {!routeResult ? (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {cities.map((city, idx) => (
+                <View key={idx} style={{ marginBottom: 15 }}>
+                  <Text style={{ color: '#6366f1', fontSize: 10, fontWeight: 'bold', letterSpacing: 1, marginBottom: 5, textTransform: 'uppercase' }}>
+                    {idx === 0 ? 'STARTING POINT' : `STOP ${idx}`}
+                  </Text>
+                  <View style={{ flexDirection: 'row', backgroundColor: '#171717', borderRadius: 8, borderWidth: 1, borderColor: '#262626', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 12 }}>
+                    <Text style={{ color: 'white', flex: 1, fontWeight: '600' }}>{city.name}</Text>
+                    {idx > 0 && (
+                      <TouchableOpacity onPress={() => removeCity(idx)}>
+                        <Text style={{ color: '#525252', fontWeight: 'bold', fontSize: 16 }}>×</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
+              ))}
+
+              <Text style={{ color: '#6366f1', fontSize: 10, fontWeight: 'bold', letterSpacing: 1, marginBottom: 5, marginTop: 10, textTransform: 'uppercase' }}>
+                ADD NEXT DESTINATION
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TextInput 
+                  placeholder="Search any city in India..."
+                  placeholderTextColor="#525252"
+                  value={newCity}
+                  onChangeText={setNewCity}
+                  style={{ flex: 1, backgroundColor: '#171717', color: 'white', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#262626' }}
+                />
+                <TouchableOpacity onPress={addCity} style={{ backgroundColor: '#6366f1', justifyContent: 'center', paddingHorizontal: 20, borderRadius: 8 }}>
+                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Add</Text>
+                </TouchableOpacity>
               </View>
-            ))}
 
-            <Text style={{ color: '#6366f1', fontSize: 10, fontWeight: 'bold', letterSpacing: 1, marginBottom: 5, marginTop: 10, textTransform: 'uppercase' }}>
-              ADD NEXT DESTINATION
-            </Text>
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <TextInput 
-                placeholder="Search any city in India..."
-                placeholderTextColor="#525252"
-                value={newCity}
-                onChangeText={setNewCity}
-                style={{ flex: 1, backgroundColor: '#171717', color: 'white', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#262626' }}
-              />
-              <TouchableOpacity onPress={addCity} style={{ backgroundColor: '#6366f1', justifyContent: 'center', paddingHorizontal: 20, borderRadius: 8 }}>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>Add</Text>
+              <TouchableOpacity onPress={handleGenerate} style={{ backgroundColor: '#6366f1', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 40, flexDirection: 'row', justifyContent: 'center' }}>
+                {generating ? <ActivityIndicator color="white" /> : <><Text style={{ marginRight: 10 }}>✨</Text><Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Optimize Route</Text></>}
               </TouchableOpacity>
+            </ScrollView>
+          ) : (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ backgroundColor: '#0f172a', padding: 25, borderRadius: 16, width: '100%', shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
+                <View style={{ width: 48, height: 48, backgroundColor: 'rgba(16, 185, 129, 0.2)', borderRadius: 24, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 15 }}>
+                  <Text style={{ color: '#34d399', fontSize: 24 }}>✓</Text>
+                </View>
+                <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>Route Optimized!</Text>
+                <Text style={{ color: '#94a3b8', fontSize: 14, textAlign: 'center', marginBottom: 25 }}>Best path for {routeResult.stops} locations.</Text>
+                  
+                <View style={{ marginBottom: 25 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 12, marginBottom: 12 }}>
+                    <Text style={{ color: '#94a3b8', fontSize: 14 }}>Total Distance</Text>
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>{routeResult.distance}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 12, marginBottom: 12 }}>
+                    <Text style={{ color: '#94a3b8', fontSize: 14 }}>Travel Time</Text>
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>{routeResult.time}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ color: '#94a3b8', fontSize: 14 }}>Taxi Estimate</Text>
+                    <Text style={{ color: '#34d399', fontWeight: 'bold', fontSize: 14 }}>{routeResult.cost}</Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity onPress={() => onNavigate('Hotels')} style={{ backgroundColor: '#4f46e5', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
+                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Find Hotels on Route</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onNavigate('Cabs')} style={{ backgroundColor: '#1e293b', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
+                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Book Taxi</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => Linking.openURL(`https://www.google.com/maps/dir/${cities.map(c => encodeURIComponent(c.name)).join('/')}`)} style={{ backgroundColor: '#2563eb', paddingVertical: 14, borderRadius: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
+                  <Text style={{ marginRight: 8, fontSize: 16 }}>🌍</Text>
+                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Open in Google Maps</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => setRouteResult(null)} style={{ marginTop: 15, paddingVertical: 10, alignItems: 'center' }}>
+                  <Text style={{ color: '#94a3b8', fontSize: 14 }}>Close & Edit Route</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-
-            <TouchableOpacity onPress={handleGenerate} style={{ backgroundColor: '#6366f1', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 40, flexDirection: 'row', justifyContent: 'center' }}>
-              {generating ? <ActivityIndicator color="white" /> : <><Text style={{ marginRight: 10 }}>✨</Text><Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Optimize Route</Text></>}
-            </TouchableOpacity>
-
-          </ScrollView>
+          )}
         </View>
 
         {/* RIGHT PANEL (Map View & Results) */}
@@ -925,47 +966,7 @@ const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string) => v
              style={{ flex: 1, width: '100%', height: '100%' }}
            />
 
-           {routeResult && (
-             <View style={{ position: 'absolute', bottom: 0, width: '100%', padding: 20, alignItems: 'center' }}>
-               <View style={{ backgroundColor: '#0f172a', padding: 25, borderRadius: 16, width: '100%', maxWidth: 400, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
-                 <View style={{ width: 48, height: 48, backgroundColor: 'rgba(16, 185, 129, 0.2)', borderRadius: 24, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 15 }}>
-                   <Text style={{ color: '#34d399', fontSize: 24 }}>✓</Text>
-                 </View>
-                 <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 }}>Route Optimized!</Text>
-                 <Text style={{ color: '#94a3b8', fontSize: 14, textAlign: 'center', marginBottom: 25 }}>Best path for {routeResult.stops} locations.</Text>
-                   
-                   <View style={{ marginBottom: 25 }}>
-                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 12, marginBottom: 12 }}>
-                       <Text style={{ color: '#94a3b8', fontSize: 14 }}>Total Distance</Text>
-                       <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>{routeResult.distance}</Text>
-                     </View>
-                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 12, marginBottom: 12 }}>
-                       <Text style={{ color: '#94a3b8', fontSize: 14 }}>Travel Time</Text>
-                       <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>{routeResult.time}</Text>
-                     </View>
-                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                       <Text style={{ color: '#94a3b8', fontSize: 14 }}>Taxi Estimate</Text>
-                       <Text style={{ color: '#34d399', fontWeight: 'bold', fontSize: 14 }}>{routeResult.cost}</Text>
-                     </View>
-                   </View>
-
-                   <TouchableOpacity onPress={() => onNavigate('Hotels')} style={{ backgroundColor: '#4f46e5', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
-                     <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Find Hotels on Route</Text>
-                   </TouchableOpacity>
-                   <TouchableOpacity onPress={() => onNavigate('Cabs')} style={{ backgroundColor: '#1e293b', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
-                     <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Book Taxi</Text>
-                   </TouchableOpacity>
-                   <TouchableOpacity onPress={() => Linking.openURL(`https://www.google.com/maps/dir/${cities.map(c => encodeURIComponent(c.name)).join('/')}`)} style={{ backgroundColor: '#2563eb', paddingVertical: 14, borderRadius: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                     <Text style={{ marginRight: 8, fontSize: 16 }}>🌍</Text>
-                     <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Open in Google Maps</Text>
-                   </TouchableOpacity>
-
-                 <TouchableOpacity onPress={() => setRouteResult(null)} style={{ marginTop: 15, paddingVertical: 10, alignItems: 'center' }}>
-                   <Text style={{ color: '#94a3b8', fontSize: 14 }}>Close & Edit Route</Text>
-                 </TouchableOpacity>
-               </View>
-             </View>
-           )}
+          {/* routeResult has been moved to the Left Panel to keep map fully visible */}
         </View>
         
       </View>
@@ -1834,7 +1835,7 @@ const AppContent = () => {
       {/* Side Menu Drawer (Modal) */}
       <Modal visible={isMenuOpen} transparent={true} animationType="fade">
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' }} activeOpacity={1} onPress={() => setIsMenuOpen(false)}>
-          <View style={{ position: 'absolute', top: isWeb ? 60 : 70, left: 20, width: 280, backgroundColor: '#0f172a', borderRadius: 20, padding: 20, maxHeight: '80%', shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
+          <TouchableOpacity activeOpacity={1} style={{ position: 'absolute', top: 0, left: 0, width: 300, height: '100%', backgroundColor: '#0f172a', padding: 20, paddingTop: isWeb ? 20 : 50, shadowColor: '#000', shadowOffset: { width: 10, height: 0 }, shadowOpacity: 0.5, shadowRadius: 20, elevation: 15, zIndex: 100 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#1e293b', paddingBottom: 15, marginBottom: 15 }}>
               {loggedUser ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -1855,66 +1856,59 @@ const AppContent = () => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={{ gap: 12 }}>
-                {['Home', 'Destinations', 'Hotels', 'Cabs', 'Restaurants', 'Packages'].map((item) => (
-                  <TouchableOpacity key={item} onPress={() => { navigateTo(item); setIsMenuOpen(false); }} style={{ paddingVertical: 5 }}>
-                    <Text style={{ color: currentScreen === item ? '#c084fc' : 'white', fontSize: 16 }}>{item === 'Home' ? '🏠 ' : item === 'Destinations' ? '📍 ' : item === 'Hotels' ? '🏨 ' : item === 'Cabs' ? '🚕 ' : item === 'Restaurants' ? '🍽️ ' : item === 'Packages' ? '🌴 ' : ''}{item}</Text>
+              <View style={{ gap: 4 }}>
+                {[
+                  { name: 'Home', icon: '🏠', route: 'Home' },
+                  { name: 'Destinations', icon: '📍', route: 'Destinations' },
+                  { name: 'AI Trip Planner', icon: '🤖', route: 'AITripPlanner' },
+                  { name: 'Hotels', icon: '🏨', route: 'Hotels' },
+                  { name: 'Outstation Cabs', icon: '🚕', route: 'Cabs' },
+                  { name: 'Local Rides', icon: '🛵', route: 'Local Rides' },
+                  { name: 'Restaurants', icon: '🍽️', route: 'Restaurants' },
+                  { name: 'Tour Packages', icon: '🌴', route: 'Packages' }
+                ].map((item) => (
+                  <TouchableOpacity key={item.name} onPress={() => { navigateTo(item.route); setIsMenuOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, backgroundColor: currentScreen === item.route ? '#1e293b' : 'transparent', marginBottom: 4 }}>
+                    <Text style={{ fontSize: 22, marginRight: 15 }}>{item.icon}</Text>
+                    <Text style={{ color: currentScreen === item.route ? 'white' : '#cbd5e1', fontSize: 16, fontWeight: currentScreen === item.route ? 'bold' : 'normal' }}>{item.name}</Text>
                   </TouchableOpacity>
                 ))}
-                
-                <View style={{ height: 1, backgroundColor: '#1e293b', marginVertical: 5 }} />
-                
-                {/* App Settings */}
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 5 }}>
-                  <Text style={{ fontSize: 16 }}>⚙️</Text>
-                  <Text style={{ color: 'white', fontSize: 16 }}>App Settings</Text>
-                </TouchableOpacity>
+              </View>
 
-                {/* Highlighted Local Rides */}
-                <TouchableOpacity 
-                  onPress={() => { navigateTo('Local Rides'); setIsMenuOpen(false); }} 
-                  style={{ marginTop: 10, backgroundColor: 'rgba(250, 204, 21, 0.1)', borderColor: 'rgba(250, 204, 21, 0.3)', borderWidth: 1, borderRadius: 12, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 16 }}>🛺 🛵 🚗</Text>
-                    <Text style={{ color: '#facc15', fontSize: 16, fontWeight: 'bold' }}>Local Rides</Text>
-                  </View>
-                  <View style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <View style={{ width: 6, height: 6, backgroundColor: '#ef4444', borderRadius: 3 }} />
-                    <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: 'bold' }}>LIVE</Text>
-                  </View>
+              {/* Partner Dashboard - Separated */}
+              <View style={{ marginTop: 20, borderTopWidth: 1, borderTopColor: '#1e293b', paddingTop: 20 }}>
+                <TouchableOpacity onPress={() => { navigateTo('PartnerLogin'); setIsMenuOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, backgroundColor: currentScreen === 'PartnerLogin' ? '#1e293b' : 'transparent', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 22, marginRight: 15 }}>💼</Text>
+                  <Text style={{ color: '#6366f1', fontSize: 16, fontWeight: 'bold' }}>Partner Dashboard</Text>
                 </TouchableOpacity>
-
-                {/* Partner Portal */}
-                <TouchableOpacity onPress={() => { navigateTo('PartnerLogin'); setIsMenuOpen(false); }} style={{ marginTop: 10, backgroundColor: 'rgba(99, 102, 241, 0.9)', borderRadius: 12, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Text style={{ fontSize: 16 }}>💼</Text>
-                  <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Partner Login</Text>
+                <TouchableOpacity onPress={() => { setIsMenuOpen(false); alert('Settings coming soon!'); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, marginTop: 4 }}>
+                  <Text style={{ fontSize: 22, marginRight: 15 }}>⚙️</Text>
+                  <Text style={{ color: '#cbd5e1', fontSize: 16 }}>App Settings</Text>
                 </TouchableOpacity>
-                
                 {!loggedUser && (
-                  <TouchableOpacity onPress={() => { navigateTo('Login'); setIsMenuOpen(false); }} style={{ marginTop: 10, backgroundColor: 'transparent', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 12, padding: 10, alignItems: 'center' }}>
+                  <TouchableOpacity onPress={() => { navigateTo('Login'); setIsMenuOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, marginTop: 4 }}>
+                    <Text style={{ fontSize: 22, marginRight: 15 }}>👤</Text>
                     <Text style={{ color: '#60a5fa', fontSize: 16, fontWeight: 'bold' }}>Login / Join</Text>
                   </TouchableOpacity>
                 )}
-
-                {/* Customer Review Section */}
-                <View style={{ backgroundColor: '#1e293b', padding: 15, borderRadius: 12, marginTop: 15 }}>
-                  <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8, fontSize: 12 }}>⭐ Write a Review</Text>
-                  <TextInput 
-                    value={reviewText}
-                    onChangeText={setReviewText}
-                    placeholder="How was your experience?"
-                    placeholderTextColor="#64748b"
-                    multiline
-                    style={{ backgroundColor: '#020617', color: 'white', padding: 8, borderRadius: 8, height: 60, textAlignVertical: 'top', marginBottom: 8, fontSize: 12 }}
-                  />
-                  <TouchableOpacity onPress={submitReview} style={{ backgroundColor: '#6366f1', padding: 8, borderRadius: 8, alignItems: 'center' }}>
-                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>Submit Review</Text>
-                  </TouchableOpacity>
-                </View>
+              </View>
+              
+              {/* Customer Review Section */}
+              <View style={{ backgroundColor: '#1e293b', padding: 15, borderRadius: 12, marginTop: 15 }}>
+                <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8, fontSize: 12 }}>⭐ Write a Review</Text>
+                <TextInput 
+                  value={reviewText}
+                  onChangeText={setReviewText}
+                  placeholder="How was your experience?"
+                  placeholderTextColor="#64748b"
+                  multiline
+                  style={{ backgroundColor: '#020617', color: 'white', padding: 8, borderRadius: 8, height: 60, textAlignVertical: 'top', marginBottom: 8, fontSize: 12 }}
+                />
+                <TouchableOpacity onPress={submitReview} style={{ backgroundColor: '#6366f1', padding: 8, borderRadius: 8, alignItems: 'center' }}>
+                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>Submit Review</Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
-          </View>
+          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
 
