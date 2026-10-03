@@ -1,0 +1,328 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../services/api/node_modules/@prisma/client"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("TRAVELLER") // Replacing Enum for SQLite compatibility
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  refreshTokens RefreshToken[]
+  hotels        Hotel[]        @relation("HotelOwner")
+  taxiCompanies TaxiCompany[]  @relation("TaxiOwner")
+  restaurants   Restaurant[]   @relation("RestaurantOwner")
+  localRides    LocalRide[]    @relation("LocalRideOwner")
+  tourPackages  TourPackage[]  @relation("TourPackageOwner")
+  bookings      HotelBooking[]
+  rideBookings  LocalRideBooking[]
+  subscription  Subscription?
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Destination {
+  id        String   @id @default(uuid())
+  name      String
+  state     String
+  country   String
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  hotels      Hotel[]
+  restaurants Restaurant[]
+}
+
+model Hotel {
+  id            String   @id @default(uuid())
+  slug          String   @unique @default(uuid())
+  name          String
+  description   String?
+  address       String
+  contactPhone  String?
+  contactEmail  String?
+  photos        String?  // JSON stringified array of URLs
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  latitude      Float
+  longitude     Float
+  ownerId       String
+  owner         User     @relation("HotelOwner", fields: [ownerId], references: [id])
+  status        String   @default("DRAFT") // DRAFT, PENDING_REVIEW, APPROVED, REJECTED
+  
+  // Verification Documents
+  tradeLicense   String?
+  gstCertificate String?
+  ownerIdProof   String?
+  isVerified     Boolean @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  roomTypes     RoomType[]
+}
+
+model RoomType {
+  id          String   @id @default(uuid())
+  hotelId     String
+  hotel       Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  photos      String?  // JSON string
+  amenities   String?  // JSON string
+  capacity    Int
+  basePrice   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  inventory   RoomInventory[]
+}
+
+model RoomInventory {
+  id             String   @id @default(uuid())
+  roomTypeId     String
+  roomType       RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  date           DateTime 
+  totalRooms     Int
+  availableRooms Int
+  price          Float
+  
+  @@unique([roomTypeId, date])
+}
+
+model HotelBooking {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  status        String   @default("HOLD") // HOLD, PENDING_PAYMENT, CONFIRMED, CANCELLED, EXPIRED
+  totalAmount   Float
+  checkIn       DateTime
+  checkOut      DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TaxiCompany {
+  id          String   @id @default(uuid())
+  slug        String   @unique @default(uuid())
+  name        String
+  description String?
+  contactPhone String?
+  ownerId     String
+  owner       User     @relation("TaxiOwner", fields: [ownerId], references: [id])
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  taxis       Taxi[]
+}
+
+model Taxi {
+  id             String      @id @default(uuid())
+  companyId      String
+  company        TaxiCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  modelName      String      // e.g., Innova Crysta, Swift Dzire
+  vehicleNumber  String      @unique
+  photos         String?     // JSON string
+  capacity       Int
+  
+  // Pricing Details
+  basePrice      Float
+  perKmRate      Float
+  driverAllowance Float
+  tollTax        Float?
+  stateTax       Float?
+  
+  // Verification Documents
+  rcBook         String?
+  insurancePolicy String?
+  fitnessCert    String?
+  isVerified     Boolean     @default(false)
+  
+  status         String      @default("AVAILABLE") // AVAILABLE, IN_TRIP, MAINTENANCE
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Restaurant {
+  id            String   @id @default(uuid())
+  slug          String   @unique
+  name          String
+  description   String
+  address       String
+  contactPhone  String
+  cuisineType   String   // e.g. "Gujarati, Punjabi, South Indian"
+  vegOnly       Boolean  @default(true)
+  avgCostForTwo Float?
+  image         String?
+  
+  ownerId       String
+  owner         User     @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  
+  // Verification Documents
+  fssaiLicense String?
+  tradeLicense String?
+  menuPhotos   String?   // JSON string
+  isVerified   Boolean @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model LocalRide {
+  id            String   @id @default(uuid())
+  slug          String   @unique @default(uuid())
+  driverName    String
+  vehicleType   String   // "Auto", "Bike", "Cab"
+  vehicleModel  String   // e.g. "Bajaj RE", "Honda Activa", "Maruti Swift"
+  vehicleNumber String
+  city          String
+  baseFare      Float
+  perKmRate     Float
+  contactPhone  String
+  photos        String?  // JSON string
+  available     Boolean  @default(true)
+  rating        Float    @default(0.0)
+  reviews       Int      @default(0)
+  
+  ownerId       String
+  owner         User     @relation("LocalRideOwner", fields: [ownerId], references: [id])
+  
+  // Verification Documents
+  drivingLicense  String?
+  rcBook          String?
+  insurancePolicy String?
+  fitnessCert     String?
+  isVerified      Boolean @default(false)
+  
+  bookings      LocalRideBooking[]
+  offers        RideOffer[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TourPackage {
+  id            String   @id @default(uuid())
+  slug          String   @unique @default(uuid())
+  title         String
+  description   String
+  durationDays  Int
+  durationNights Int
+  destination   String
+  price         Float
+  contactPhone  String
+  includesFood  Boolean  @default(true)
+  includesStay  Boolean  @default(true)
+  photos        String?  // JSON string
+  rating        Float    @default(0.0)
+  reviews       Int      @default(0)
+  
+  ownerId       String
+  owner         User     @relation("TourPackageOwner", fields: [ownerId], references: [id])
+  
+  // Verification Documents
+  govtRegistration String?
+  ownerPanCard     String?
+  isVerified       Boolean @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Subscription {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          String    @default("TRIAL") // TRIAL, ACTIVE, EXPIRED, CANCELLED
+  trialEndsAt     DateTime
+  currentPeriodEnd DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  payments        Payment[]
+}
+
+model Payment {
+  id              String       @id @default(uuid())
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id])
+  amount          Float
+  currency        String       @default("INR")
+  status          String       @default("PENDING") // PENDING, SUCCESS, FAILED
+  paymentMethod   String?
+  transactionId   String?      @unique
+  createdAt       DateTime     @default(now())
+}
+
+model LocalRideBooking {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  
+  pickupAddress String
+  dropAddress   String
+  pickupLat     Float?
+  pickupLng     Float?
+  dropLat       Float?
+  dropLng       Float?
+  
+  vehicleType   String   // "Auto", "Bike", "Cab"
+  status        String   @default("SEARCHING") // SEARCHING, ACCEPTED, ARRIVING, IN_PROGRESS, COMPLETED, CANCELLED
+  
+  otpPin        String?  // 4-digit PIN for ride start
+  estimatedFare Float?
+  actualFare    Float?
+  
+  assignedRideId String?
+  assignedRide   LocalRide? @relation(fields: [assignedRideId], references: [id])
+  
+  offers        RideOffer[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model RideOffer {
+  id            String   @id @default(uuid())
+  bookingId     String
+  booking       LocalRideBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  localRideId   String
+  localRide     LocalRide @relation(fields: [localRideId], references: [id])
+  
+  status        String   @default("PENDING") // PENDING, ACCEPTED, REJECTED, MISSED
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([bookingId, localRideId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  text      String
+  source    String   @default("web")
+  createdAt DateTime @default(now())
+}

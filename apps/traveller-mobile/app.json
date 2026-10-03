@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "YatraSangi",
+    "slug": "traveller-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/yatrasangi_logo.jpeg",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.travelpartner.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/yatrasangi_logo.jpeg",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.travelpartner.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/yatrasangi_logo.jpeg"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f6bc195d-1623-4202-be76-43aee89c7b70"
+      }
+    },
+    "owner": "12341232-2",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f6bc195d-1623-4202-be76-43aee89c7b70"
+    }
+  }
+}
