@@ -1,13 +1,54 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { io, Socket } from 'socket.io-client';
 
 export default function VendorDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [incomingRides, setIncomingRides] = useState<any[]>([]);
+  const [vendorId] = useState('driver-001'); // Mock vendor ID
+
+  useEffect(() => {
+    if (isRegistered) {
+      const newSocket = io('http://localhost:3004');
+      setSocket(newSocket);
+
+      newSocket.on('connect', () => {
+        console.log('Vendor connected to WebSocket');
+        newSocket.emit('driver_online', { driverId: vendorId });
+      });
+
+      newSocket.on('new_ride_request', (ride) => {
+        console.log('New ride received:', ride);
+        setIncomingRides(prev => [...prev, ride]);
+      });
+
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [isRegistered, vendorId]);
+
+  const acceptRide = (bookingId: string) => {
+    if (socket) {
+      socket.emit('accept_ride', { bookingId, driverId: vendorId });
+      
+      // Listen for success or failure just for this booking
+      socket.once('ride_accepted_success', (confirmedBooking) => {
+        alert('You successfully accepted the ride!');
+        setIncomingRides(prev => prev.filter(r => r.id !== bookingId));
+      });
+      socket.once('ride_accepted_failed', (data) => {
+        alert('Failed to accept: ' + data.message);
+        setIncomingRides(prev => prev.filter(r => r.id !== bookingId));
+      });
+    }
+  };
 
   return (
     <div 
@@ -674,6 +715,51 @@ export default function VendorDashboard() {
                     Submit Documents
                   </button>
                 </div>
+              </div>
+
+              {/* Real-time Ride Requests */}
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                    Live Ride Requests
+                  </h3>
+                  <span className="text-xs font-bold text-slate-500 bg-slate-800 px-2 py-1 rounded">Searching...</span>
+                </div>
+                
+                {incomingRides.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500">
+                    <div className="text-4xl mb-2">📡</div>
+                    <p>No new ride requests right now.</p>
+                    <p className="text-xs mt-1">Keep this page open to receive live bookings.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {incomingRides.map(ride => (
+                      <div key={ride.id} className="bg-slate-950 border border-yellow-500/30 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div className="flex-1 w-full">
+                          <div className="flex justify-between mb-2">
+                            <span className="text-xs font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded uppercase">New Request</span>
+                            <span className="text-xs text-slate-400">Just now</span>
+                          </div>
+                          <p className="text-white font-medium mb-1 flex items-center gap-2"><span className="text-green-500">🟢</span> {ride.pickup}</p>
+                          <p className="text-white font-medium flex items-center gap-2"><span className="text-red-500">📍</span> {ride.drop}</p>
+                        </div>
+                        <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
+                          <button onClick={() => acceptRide(ride.id)} className="flex-1 sm:flex-none px-6 py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-900 rounded-lg font-bold shadow-lg shadow-yellow-500/20 transition-all text-sm">
+                            Accept Ride
+                          </button>
+                          <button onClick={() => setIncomingRides(prev => prev.filter(r => r.id !== ride.id))} className="flex-1 sm:flex-none px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium transition-all text-sm">
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

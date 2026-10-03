@@ -1530,6 +1530,7 @@ const TravelerDashboardScreen = ({ user, onPlanTrip }: { user: any, onPlanTrip: 
 
 const AppContent = () => {
   const [currentScreen, setCurrentScreen] = useState<string>('Home');
+  const [history, setHistory] = useState<string[]>([]);
   const [selectedDestId, setSelectedDestId] = useState<string | null>(null);
   const [loggedUser, setLoggedUser] = useState<any>(null);
   
@@ -1607,6 +1608,13 @@ const AppContent = () => {
         setSelectedDestId(null);
         return true;
       }
+      if (history.length > 0) {
+        const newHistory = [...history];
+        const prev = newHistory.pop();
+        setHistory(newHistory);
+        if (prev) setCurrentScreen(prev);
+        return true;
+      }
       if (currentScreen !== 'Home') {
         setCurrentScreen('Home');
         return true;
@@ -1615,7 +1623,27 @@ const AppContent = () => {
     };
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => subscription.remove();
-  }, [currentScreen, selectedDestId]);
+  }, [currentScreen, selectedDestId, history]);
+
+  const navigateTo = (screen: string) => {
+    setHistory(prev => [...prev, currentScreen]);
+    setCurrentScreen(screen);
+  };
+
+  const navigateBack = () => {
+    if (selectedDestId) {
+      setSelectedDestId(null);
+      return;
+    }
+    if (history.length > 0) {
+      const newHistory = [...history];
+      const prev = newHistory.pop();
+      setHistory(newHistory);
+      if (prev) setCurrentScreen(prev);
+    } else {
+      setCurrentScreen('Home');
+    }
+  };
 
   const navigateToDetail = (id: string) => setSelectedDestId(id);
   const handleBack = () => setSelectedDestId(null);
@@ -1641,9 +1669,16 @@ const AppContent = () => {
       {/* Top Navbar with Menu Button */}
       {!selectedDestId && (
         <View style={[styles.topNavbar, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: isWeb ? 15 : 25, zIndex: 50 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={require('./assets/yatrasangi_logo.jpeg')} style={{ width: 30, height: 30, borderRadius: 8, marginRight: 10 }} />
-            <Text style={{ color: '#818cf8', fontSize: 22, fontWeight: 'bold' }}>YatraSangi</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            {currentScreen !== 'Home' && (
+              <TouchableOpacity onPress={navigateBack} style={{ padding: 5, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>←</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={() => currentScreen !== 'Home' && navigateTo('Home')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={require('./assets/yatrasangi_logo.jpeg')} style={{ width: 30, height: 30, borderRadius: 8, marginRight: 10 }} />
+              <Text style={{ color: '#818cf8', fontSize: 22, fontWeight: 'bold' }}>YatraSangi</Text>
+            </TouchableOpacity>
           </View>
           
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
@@ -1699,7 +1734,7 @@ const AppContent = () => {
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={{ gap: 12 }}>
                 {['Home', 'Destinations', 'Hotels', 'Cabs', 'Restaurants', 'Packages'].map((item) => (
-                  <TouchableOpacity key={item} onPress={() => { setCurrentScreen(item); setIsMenuOpen(false); }} style={{ paddingVertical: 5 }}>
+                  <TouchableOpacity key={item} onPress={() => { navigateTo(item); setIsMenuOpen(false); }} style={{ paddingVertical: 5 }}>
                     <Text style={{ color: currentScreen === item ? '#c084fc' : 'white', fontSize: 16 }}>{item === 'Home' ? '🏠 ' : item === 'Destinations' ? '📍 ' : item === 'Hotels' ? '🏨 ' : item === 'Cabs' ? '🚕 ' : item === 'Restaurants' ? '🍽️ ' : item === 'Packages' ? '🌴 ' : ''}{item}</Text>
                   </TouchableOpacity>
                 ))}
@@ -1714,7 +1749,7 @@ const AppContent = () => {
 
                 {/* Highlighted Local Rides */}
                 <TouchableOpacity 
-                  onPress={() => { setCurrentScreen('Local Rides'); setIsMenuOpen(false); }} 
+                  onPress={() => { navigateTo('Local Rides'); setIsMenuOpen(false); }} 
                   style={{ marginTop: 10, backgroundColor: 'rgba(250, 204, 21, 0.1)', borderColor: 'rgba(250, 204, 21, 0.3)', borderWidth: 1, borderRadius: 12, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -1728,13 +1763,13 @@ const AppContent = () => {
                 </TouchableOpacity>
 
                 {/* Partner Portal */}
-                <TouchableOpacity onPress={() => { setCurrentScreen('PartnerLogin'); setIsMenuOpen(false); }} style={{ marginTop: 10, backgroundColor: 'rgba(99, 102, 241, 0.9)', borderRadius: 12, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <TouchableOpacity onPress={() => { navigateTo('PartnerLogin'); setIsMenuOpen(false); }} style={{ marginTop: 10, backgroundColor: 'rgba(99, 102, 241, 0.9)', borderRadius: 12, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <Text style={{ fontSize: 16 }}>💼</Text>
                   <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Partner Login</Text>
                 </TouchableOpacity>
                 
                 {!loggedUser && (
-                  <TouchableOpacity onPress={() => { setCurrentScreen('Login'); setIsMenuOpen(false); }} style={{ marginTop: 10, backgroundColor: 'transparent', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 12, padding: 10, alignItems: 'center' }}>
+                  <TouchableOpacity onPress={() => { navigateTo('Login'); setIsMenuOpen(false); }} style={{ marginTop: 10, backgroundColor: 'transparent', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 12, padding: 10, alignItems: 'center' }}>
                     <Text style={{ color: '#60a5fa', fontSize: 16, fontWeight: 'bold' }}>Login / Join</Text>
                   </TouchableOpacity>
                 )}
@@ -1765,18 +1800,18 @@ const AppContent = () => {
           <DestinationDetailScreen destinationId={selectedDestId} onBack={handleBack} />
         ) : (
           <>
-            {currentScreen === 'Home' && <HomeScreen destinations={apiDestinations} onNavigateToDetail={navigateToDetail} onStartAI={() => setCurrentScreen('Trip Planner')} onNavigate={setCurrentScreen} />}
+            {currentScreen === 'Home' && <HomeScreen destinations={apiDestinations} onNavigateToDetail={navigateToDetail} onStartAI={() => navigateTo('Trip Planner')} onNavigate={navigateTo} />}
             {currentScreen === 'Destinations' && <DestinationsScreen destinations={apiDestinations} onNavigateToDetail={navigateToDetail} />}
-            {currentScreen === 'Trip Planner' && <AITripPlannerScreen onNavigate={setCurrentScreen} />}
+            {currentScreen === 'Trip Planner' && <AITripPlannerScreen onNavigate={navigateTo} />}
             {currentScreen === 'Hotels' && <HotelsScreen />}
             {currentScreen === 'Cabs' && <CabsScreen />}
             {currentScreen === 'Restaurants' && <RestaurantsScreen />}
             {currentScreen === 'Packages' && <PackagesScreen />}
             {currentScreen === 'Local Rides' && <LocalRidesScreen />}
             {currentScreen === 'PartnerDashboard' && <PartnerDashboardScreen />}
-            {currentScreen === 'TravelerDashboard' && <TravelerDashboardScreen user={loggedUser} onPlanTrip={() => setCurrentScreen('Trip Planner')} />}
-            {currentScreen === 'Login' && <TravelerLoginScreen onLogin={(u) => { setLoggedUser(u); setCurrentScreen('TravelerDashboard'); }} />}
-            {currentScreen === 'PartnerLogin' && <PartnerLoginScreen onLogin={() => setCurrentScreen('PartnerDashboard')} />}
+            {currentScreen === 'TravelerDashboard' && <TravelerDashboardScreen user={loggedUser} onPlanTrip={() => navigateTo('Trip Planner')} />}
+            {currentScreen === 'Login' && <TravelerLoginScreen onLogin={(u) => { setLoggedUser(u); navigateTo('TravelerDashboard'); }} />}
+            {currentScreen === 'PartnerLogin' && <PartnerLoginScreen onLogin={() => navigateTo('PartnerDashboard')} />}
             {!['Home', 'Destinations', 'Trip Planner', 'Hotels', 'Cabs', 'Restaurants', 'Packages', 'Local Rides', 'PartnerDashboard', 'TravelerDashboard', 'Login', 'PartnerLogin'].includes(currentScreen) && (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, color: 'white', fontWeight: 'bold' }}>{currentScreen}</Text>
