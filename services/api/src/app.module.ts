@@ -9,9 +9,11 @@ import { TaxisModule } from './taxis/taxis.module.js';
 import { VendorModule } from './vendor/vendor.module.js';
 import { LocalRidesModule } from './local-rides/local-rides.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
+import { RestaurantsModule } from './restaurants/restaurants.module.js';
+import { PackagesModule } from './packages/packages.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, DestinationsModule, HotelsModule, TaxisModule, VendorModule, LocalRidesModule, ReviewsModule],
+  imports: [PrismaModule, AuthModule, DestinationsModule, HotelsModule, TaxisModule, VendorModule, LocalRidesModule, ReviewsModule, RestaurantsModule, PackagesModule],
   controllers: [AppController],
   providers: [AppService],
 })

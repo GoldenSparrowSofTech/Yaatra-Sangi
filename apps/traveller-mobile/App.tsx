@@ -4,6 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { io, Socket } from 'socket.io-client';
 import { WebView } from 'react-native-webview';
 const isWeb = Platform.OS === 'web';
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004');
 
 // --- TYPES ---
 interface Destination {
@@ -285,7 +286,7 @@ const DestinationDetailScreen: React.FC<DestinationDetailProps> = ({ destination
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const apiUrl = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
+    const apiUrl = EXPO_PUBLIC_API_URL;
     
     fetch(`${apiUrl}/destinations/${destinationId}`)
       .then(res => res.json())
@@ -405,7 +406,7 @@ const HotelsScreen = () => {
   ];
 
   useEffect(() => {
-    fetch('http://192.168.1.111:3004/hotels')
+    fetch(`${EXPO_PUBLIC_API_URL}/hotels`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -471,7 +472,7 @@ const CabsScreen = () => {
   ];
 
   useEffect(() => {
-    fetch('http://192.168.1.111:3004/taxis')
+    fetch(`${EXPO_PUBLIC_API_URL}/taxis`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) setCabs(data);
@@ -547,7 +548,7 @@ const RestaurantsScreen = () => {
   ];
 
   useEffect(() => {
-    fetch('http://192.168.1.111:3004/restaurants')
+    fetch('EXPO_PUBLIC_API_URL/restaurants')
       .then(res => res.json())
       .then(data => setRestaurants(data && data.length > 0 ? data : fallbackRestaurants))
       .catch(() => setRestaurants(fallbackRestaurants))
@@ -606,7 +607,7 @@ const PackagesScreen = () => {
   ];
 
   useEffect(() => {
-    fetch('http://192.168.1.111:3004/packages')
+    fetch('EXPO_PUBLIC_API_URL/packages')
       .then(res => res.json())
       .then(data => setPackages(data && data.length > 0 ? data : fallbackPackages))
       .catch(() => setPackages(fallbackPackages))
@@ -1054,7 +1055,7 @@ const CustomRouteScreen = () => {
   );
 };
 
-const API_BASE_URL = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
+const API_BASE_URL = EXPO_PUBLIC_API_URL;
 
 const GenericListScreen = ({ endpoint, title, icon, subtitle }: { endpoint: string, title: string, icon: string, subtitle: string }) => {
   const [data, setData] = useState<any[]>([]);
@@ -1269,7 +1270,7 @@ const PartnerDashboardScreen = () => {
   const [vendorId] = useState('driver-mobile-001');
 
   useEffect(() => {
-    const apiUrl = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
+    const apiUrl = EXPO_PUBLIC_API_URL;
     const newSocket = io(apiUrl);
     setSocket(newSocket);
 
@@ -1670,7 +1671,7 @@ const AppContent = () => {
     if (!reviewText.trim()) return;
     
     try {
-      const apiUrl = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
+      const apiUrl = EXPO_PUBLIC_API_URL;
       const response = await fetch(`${apiUrl}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1694,7 +1695,7 @@ const AppContent = () => {
   };
 
   useEffect(() => {
-    const apiUrl = isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004';
+    const apiUrl = EXPO_PUBLIC_API_URL;
     
     // Fetch live destinations from backend
     fetch(`${apiUrl}/destinations`)
