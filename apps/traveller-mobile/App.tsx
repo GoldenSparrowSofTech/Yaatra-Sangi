@@ -1811,6 +1811,10 @@ const AppContent = () => {
               <Text style={{ color: 'white', fontWeight: 'bold' }}>{currentLang}</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity onPress={() => currentScreen !== 'Home' && navigateTo('Home')} style={{ padding: 5 }}>
+              <Text style={{ fontSize: 24, color: 'white' }}>🏠</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity onPress={() => setIsMenuOpen(true)} style={{ padding: 5 }}>
               <Text style={{ fontSize: 24, color: 'white' }}>☰</Text>
             </TouchableOpacity>

@@ -39,15 +39,22 @@ export default function HeaderMenu() {
 
   return (
     <div className="flex items-center gap-3 mr-4">
-      {/* Hamburger Menu Button */}
-      <button 
-        onClick={() => setIsMenuOpen(true)}
-        className="w-10 h-10 flex flex-col justify-center items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700 rounded-full border border-slate-700 transition-colors"
-      >
-        <div className="w-5 h-0.5 bg-white rounded-full"></div>
-        <div className="w-5 h-0.5 bg-white rounded-full"></div>
-        <div className="w-5 h-0.5 bg-white rounded-full"></div>
-      </button>
+      <div className="flex items-center gap-3">
+        {/* Hamburger Menu Button */}
+        <button 
+          onClick={() => setIsMenuOpen(true)}
+          className="w-10 h-10 flex flex-col justify-center items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700 rounded-full border border-slate-700 transition-colors"
+        >
+          <div className="w-5 h-0.5 bg-white rounded-full"></div>
+          <div className="w-5 h-0.5 bg-white rounded-full"></div>
+          <div className="w-5 h-0.5 bg-white rounded-full"></div>
+        </button>
+
+        {/* Home Button */}
+        <Link href="/" className="w-10 h-10 flex justify-center items-center bg-slate-800/80 hover:bg-slate-700 rounded-full border border-slate-700 transition-colors">
+          <span className="text-white text-xl">🏠</span>
+        </Link>
+      </div>
 
       {/* Custom Language Selector inside Header */}
       <div className="relative hidden md:block">
