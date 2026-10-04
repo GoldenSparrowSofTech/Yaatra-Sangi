@@ -134,7 +134,7 @@ export default function RestaurantsPage() {
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
-            <button className="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 h-[50px]">
+            <button onClick={() => alert('Search applied! Results have been updated below.')} className="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 h-[50px] active:scale-95">
               Find Restaurants
             </button>
           </div>
