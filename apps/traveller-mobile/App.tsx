@@ -83,6 +83,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
     >
       <ScrollView contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         
+        {/* Floating Logo Top Left (Below Header) */}
+        <View style={{ position: 'absolute', top: 20, left: 20, zIndex: 50 }}>
+          <Image 
+            source={require('./assets/yatrasangi_logo.jpeg')} 
+            style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' }} 
+          />
+        </View>
+
         {/* Hero Section */}
         <View style={{ alignItems: 'center', paddingHorizontal: 20, paddingTop: 60, paddingBottom: 40 }}>
           <View style={{ backgroundColor: 'rgba(99,102,241,0.15)', borderColor: 'rgba(99,102,241,0.3)', borderWidth: 1, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, marginBottom: 30, shadowColor: '#6366f1', shadowOpacity: 0.2, shadowRadius: 10 }}>
