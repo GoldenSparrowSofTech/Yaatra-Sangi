@@ -9,7 +9,7 @@ export default function LocalRidesPage() {
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
   const [step, setStep] = useState<'location' | 'select_vehicle' | 'searching' | 'accepted'>('location');
-  const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' | 'cab'>('bike');
+  const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' | 'cab' | 'ambulance'>('bike');
   
   const [acceptedDriver, setAcceptedDriver] = useState<any | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -225,6 +225,21 @@ export default function LocalRidesPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-white font-bold text-lg">₹ 140</p>
+                  </div>
+                </div>
+
+                {/* Ambulance Option */}
+                <div 
+                  onClick={() => setSelectedVehicle('ambulance')}
+                  className={`flex items-center p-3 rounded-2xl border-2 cursor-pointer transition-all ${selectedVehicle === 'ambulance' ? 'bg-red-500/10 border-red-500' : 'bg-slate-900 border-transparent'}`}
+                >
+                  <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-3xl">🚑</div>
+                  <div className="ml-4 flex-1">
+                    <h4 className="text-white font-bold flex items-center gap-2">Ambulance <span className="text-[10px] bg-red-900/50 text-red-400 px-2 py-0.5 rounded border border-red-900">Emergency</span></h4>
+                    <p className="text-slate-400 text-xs">Medical transport</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white font-bold text-lg">₹ 500</p>
                   </div>
                 </div>
               </div>

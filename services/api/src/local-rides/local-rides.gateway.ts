@@ -15,8 +15,8 @@ export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconne
   @WebSocketServer()
   server: Server;
 
-  // Map to store connected drivers: driverUserId -> socketId
-  private activeDrivers = new Map<string, string>();
+  // Map to store connected drivers: driverUserId -> { socketId, vehicleType, location }
+  private activeDrivers = new Map<string, { socketId: string, vehicleType: string, location?: string }>();
 
   constructor(private readonly localRidesService: LocalRidesService) {}
 
@@ -26,9 +26,8 @@ export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconne
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
-    // Remove driver from active list if they disconnect
-    for (const [driverId, socketId] of this.activeDrivers.entries()) {
-      if (socketId === client.id) {
+    for (const [driverId, data] of this.activeDrivers.entries()) {
+      if (data.socketId === client.id) {
         this.activeDrivers.delete(driverId);
         break;
       }
@@ -38,11 +37,15 @@ export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconne
   // Driver explicitly goes "online"
   @SubscribeMessage('driver_online')
   handleDriverOnline(
-    @MessageBody() data: { driverId: string },
+    @MessageBody() data: { driverId: string, vehicleType: string, location?: string },
     @ConnectedSocket() client: Socket,
   ) {
-    this.activeDrivers.set(data.driverId, client.id);
-    console.log(`Driver ${data.driverId} is online (Socket: ${client.id})`);
+    this.activeDrivers.set(data.driverId, { 
+      socketId: client.id, 
+      vehicleType: data.vehicleType || 'bike',
+      location: data.location || 'Rajkot'
+    });
+    console.log(`Driver ${data.driverId} [${data.vehicleType}] is online (Socket: ${client.id})`);
     return { event: 'online_status', data: { success: true } };
   }
 
@@ -60,9 +63,15 @@ export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconne
     // 1. Save booking to database via service
     const booking = await this.localRidesService.createRideBooking(data);
 
-    // 2. Broadcast this new booking to ALL active drivers
-    // In a real app, you would filter by geofence/location
-    this.server.emit('new_ride_request', booking);
+    // 2. Broadcast this new booking ONLY to active drivers matching the vehicle type
+    // In a real app, you would also calculate distance between pickup and driver location
+    for (const [driverId, driverData] of this.activeDrivers.entries()) {
+      // Basic matching: Driver must have the same vehicle type
+      if (driverData.vehicleType === data.vehicleType) {
+        // Send specific event to this driver's socket
+        this.server.to(driverData.socketId).emit('new_ride_request', booking);
+      }
+    }
 
     // 3. Confirm to the customer that we are searching
     return { event: 'ride_requested', data: booking };

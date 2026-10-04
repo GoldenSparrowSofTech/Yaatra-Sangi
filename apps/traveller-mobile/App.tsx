@@ -1100,7 +1100,7 @@ const LocalRidesScreen = () => {
   const [pickup, setPickup] = useState(searchCities.length > 0 ? searchCities[0] : '');
   const [drop, setDrop] = useState('');
   const [step, setStep] = useState<'location' | 'select_vehicle' | 'searching' | 'accepted'>('location');
-  const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' | 'cab'>('bike');
+  const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' |useState<'bike' | 'auto' | 'cab' | 'ambulance'>('bike');
   
   const [acceptedDriver, setAcceptedDriver] = useState<any | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -1207,7 +1207,8 @@ const LocalRidesScreen = () => {
              {[
                { type: 'bike', icon: '🏍️', name: 'Bike', price: '₹45', time: '1 min' },
                { type: 'auto', icon: '🛺', name: 'Auto', price: '₹80', time: '3 mins' },
-               { type: 'cab', icon: '🚕', name: 'Mini Cab', price: '₹140', time: '5 mins' }
+               { type: 'cab', icon: '🚕', name: 'Mini Cab', price: '₹140', time: '5 mins' },
+               { type: 'ambulance', icon: '🚑', name: 'Ambulance', price: '₹500', time: 'ASAP' }
              ].map((v) => (
                 <TouchableOpacity key={v.type} onPress={() => setSelectedVehicle(v.type as any)} style={{ flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 15, backgroundColor: selectedVehicle === v.type ? 'rgba(250,204,21,0.1)' : '#1e293b', borderWidth: 1, borderColor: selectedVehicle === v.type ? '#facc15' : 'transparent', marginBottom: 10 }}>
                   <Text style={{ fontSize: 24, marginRight: 15 }}>{v.icon}</Text>
