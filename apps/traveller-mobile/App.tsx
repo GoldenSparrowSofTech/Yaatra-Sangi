@@ -1264,6 +1264,55 @@ const LocalRidesScreen = () => {
   );
 };
 
+
+// --- SETTINGS SCREEN ---
+const SettingsScreen = () => {
+  const [notifications, setNotifications] = useState(true);
+  const [locationServices, setLocationServices] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
+  const [dataSaver, setDataSaver] = useState(false);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#0f172a', padding: 20 }}>
+      <Text style={{ fontSize: 28, fontWeight: 'bold', color: 'white', marginBottom: 20, marginTop: 40 }}>Settings</Text>
+      
+      <View style={{ backgroundColor: '#1e293b', borderRadius: 15, padding: 15, marginBottom: 20 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <View>
+            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>🔔 Notifications</Text>
+            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Receive alerts for rides & bookings</Text>
+          </View>
+          <Switch value={notifications} onValueChange={setNotifications} trackColor={{ false: '#334155', true: '#facc15' }} thumbColor={'#ffffff'} />
+        </View>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <View>
+            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>📍 Location Services</Text>
+            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Allow access to GPS for accurate rides</Text>
+          </View>
+          <Switch value={locationServices} onValueChange={setLocationServices} trackColor={{ false: '#334155', true: '#34d399' }} thumbColor={'#ffffff'} />
+        </View>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <View>
+            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>🌙 Dark Mode</Text>
+            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Toggle application theme</Text>
+          </View>
+          <Switch value={darkMode} onValueChange={setDarkMode} trackColor={{ false: '#334155', true: '#4f46e5' }} thumbColor={'#ffffff'} />
+        </View>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View>
+            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>📶 Data Saver</Text>
+            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Reduce image quality to save data</Text>
+          </View>
+          <Switch value={dataSaver} onValueChange={setDataSaver} trackColor={{ false: '#334155', true: '#ef4444' }} thumbColor={'#ffffff'} />
+        </View>
+      </View>
+    </View>
+  );
+};
+
 // --- PARTNER DASHBOARD ---
 const PartnerDashboardScreen = () => {
   const [activeTab, setActiveTab] = useState('Overview');
@@ -1271,6 +1320,8 @@ const PartnerDashboardScreen = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [incomingRides, setIncomingRides] = useState<any[]>([]);
   const [vendorId] = useState('driver-mobile-001');
+  const [isOnline, setIsOnline] = useState(false);
+  const [vehicleType, setVehicleType] = useState('bike');
 
   useEffect(() => {
     const apiUrl = EXPO_PUBLIC_API_URL;
@@ -1279,7 +1330,7 @@ const PartnerDashboardScreen = () => {
 
     newSocket.on('connect', () => {
       console.log('Mobile Partner connected to WebSocket');
-      newSocket.emit('driver_online', { driverId: vendorId });
+      if(isOnline) { newSocket.emit('driver_online', { driverId: vendorId, vehicleType }); }
     });
 
     newSocket.on('new_ride_request', (ride) => {
@@ -1887,7 +1938,7 @@ const AppContent = () => {
                   <Text style={{ fontSize: 22, marginRight: 15 }}>💼</Text>
                   <Text style={{ color: '#6366f1', fontSize: 16, fontWeight: 'bold' }}>Partner Dashboard</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { setIsMenuOpen(false); alert('Settings coming soon!'); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, marginTop: 4 }}>
+                <TouchableOpacity onPress={() => { setIsMenuOpen(false); navigateTo('Settings'); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, marginTop: 4 }}>
                   <Text style={{ fontSize: 22, marginRight: 15 }}>⚙️</Text>
                   <Text style={{ color: '#cbd5e1', fontSize: 16 }}>App Settings</Text>
                 </TouchableOpacity>
@@ -1933,6 +1984,7 @@ const AppContent = () => {
             {currentScreen === 'Packages' && <PackagesScreen />}
             {currentScreen === 'Local Rides' && <LocalRidesScreen />}
             {currentScreen === 'PartnerDashboard' && <PartnerDashboardScreen />}
+            {currentScreen === 'Settings' && <SettingsScreen />}
             {currentScreen === 'TravelerDashboard' && <TravelerDashboardScreen user={loggedUser} onPlanTrip={() => navigateTo('Trip Planner')} />}
             {currentScreen === 'Login' && <TravelerLoginScreen onLogin={(u) => { setLoggedUser(u); navigateTo('TravelerDashboard'); }} />}
             {currentScreen === 'PartnerLogin' && <PartnerLoginScreen onLogin={() => navigateTo('PartnerDashboard')} />}

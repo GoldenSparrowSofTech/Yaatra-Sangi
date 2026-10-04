@@ -1,7 +1,10 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import Link from 'next/link';
 
 export default function PartnerDashboard() {
+  const [isOnline, setIsOnline] = useState(false);
+  const [vehicleType, setVehicleType] = useState('bike');
   return (
     <div className="min-h-screen bg-slate-950 pt-24 px-6 pb-12 font-sans text-slate-200">
       <div className="max-w-4xl mx-auto">
@@ -16,6 +19,43 @@ export default function PartnerDashboard() {
           <div>
             <h2 className="text-emerald-400 text-xl font-bold mb-1">3 Months Free Trial Active!</h2>
             <p className="text-emerald-200/70 text-sm">Enjoy zero commission and unlimited access. Billing of ₹XYZ starts automatically after 90 days.</p>
+          </div>
+        </div>
+
+        {/* Local Ride Captain Duty */}
+        <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+          <div className="mb-4 sm:mb-0">
+            <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+              🏍️ Local Ride Captain Duty
+            </h2>
+            <p className="text-slate-400 text-sm">Toggle your availability to start receiving ride requests</p>
+            <div className="mt-3 flex gap-2">
+              <select 
+                value={vehicleType} 
+                onChange={(e) => setVehicleType(e.target.value)}
+                className="bg-slate-800 text-white text-sm rounded-lg px-3 py-1 border border-slate-600 outline-none"
+              >
+                <option value="bike">🏍️ Bike</option>
+                <option value="auto">🛺 Auto</option>
+                <option value="cab">🚕 Cab</option>
+                <option value="ambulance">🚑 Ambulance</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <span className={`font-bold ${isOnline ? 'text-emerald-400' : 'text-slate-400'}`}>
+              {isOnline ? '🟢 ONLINE' : '🔴 OFFLINE'}
+            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                className="sr-only peer" 
+                checked={isOnline} 
+                onChange={() => setIsOnline(!isOnline)} 
+              />
+              <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+            </label>
           </div>
         </div>
 
