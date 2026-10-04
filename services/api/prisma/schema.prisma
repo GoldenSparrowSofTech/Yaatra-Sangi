@@ -1,0 +1,129 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("TRAVELER") // TRAVELER or PARTNER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bookings  Booking[]
+}
+
+model Destination {
+  id            String          @id @default(uuid()) // Can use string IDs like "goa"
+  name          String
+  state         String
+  country       String
+  description   String?
+  image         String?
+  type          String?         // Trending, Romantic, etc.
+  latitude      Float?
+  longitude     Float?
+  placesToVisit PlaceToVisit[]
+  hotels        Hotel[]
+  tours         Tour[]
+}
+
+model PlaceToVisit {
+  id            Int         @id @default(autoincrement())
+  name          String
+  description   String?
+  image         String?
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+}
+
+model Hotel {
+  id            Int         @id @default(autoincrement())
+  name          String
+  price         String
+  rating        Float?
+  image         String?
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+}
+
+model Tour {
+  id            Int         @id @default(autoincrement())
+  name          String
+  price         String
+  duration      String?
+  image         String?
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // HOTEL, CAB, TOUR, PACKAGE
+  status    String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  details   String?  // JSON string for specific details
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ride {
+  id            String   @id @default(uuid())
+  userId        String
+  driverId      String?
+  pickup        String
+  drop          String
+  vehicleType   String
+  status        String   @default("REQUESTED") // REQUESTED, ACCEPTED, STARTED, COMPLETED
+  price         Float?
+  otpPin        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Taxi {
+  id            Int      @id @default(autoincrement())
+  slug          String   @unique
+  name          String
+  type          String
+  model         String
+  location      String
+  capacity      String
+  bags          String
+  rating        Float?
+  price         Int
+  perKm         Boolean  @default(false)
+  image         String?
+  features      String   // Storing JSON string for features array
+  recommended   Boolean  @default(false)
+}
+
+model Restaurant {
+  id            Int      @id @default(autoincrement())
+  slug          String   @unique
+  name          String
+  cuisine       String
+  location      String
+  rating        Float?
+  priceForTwo   Int
+  image         String?
+  features      String   // Storing JSON string for features array
+}
+
+model Package {
+  id            Int      @id @default(autoincrement())
+  slug          String   @unique
+  name          String
+  destination   String
+  duration      String
+  price         Int
+  rating        Float?
+  image         String?
+  highlights    String   // Storing JSON string
+}

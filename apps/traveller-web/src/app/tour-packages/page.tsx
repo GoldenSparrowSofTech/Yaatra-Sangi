@@ -7,7 +7,7 @@ export default function TourPackagesPage() {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch('http://localhost:3004/packages');
+        const res = await fetch('http://localhost:3001/packages');
         const pkgList = await res.json();
         
         if (pkgList && pkgList.length > 0) {

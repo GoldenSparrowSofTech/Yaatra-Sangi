@@ -4,41 +4,44 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 export default function LoginPage() {
-  const [step, setStep] = useState(1);
-  const [mobile, setMobile] = useState("");
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
-  const [stateName, setStateName] = useState("");
-  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSendOTP = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mobile === "admin") {
+    if (email === "admin") {
       window.location.href = "/admin";
       return;
     }
-    if (mobile.length >= 10 && name.trim() !== "" && city.trim() !== "" && stateName.trim() !== "") {
+    
+    if (email.trim() && password.trim()) {
       setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        window.alert(`Mock SMS: Your YatraSangi OTP is 123456`);
-        setStep(2);
-      }, 1000);
-    } else {
-      window.alert("Please fill all details and enter a valid 10-digit mobile number");
-    }
-  };
+      setError("");
+      try {
+        const response = await fetch("http://localhost:3001/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-  const handleVerifyOTP = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length >= 4) {
-      setLoading(true);
-      setTimeout(() => {
-        localStorage.setItem('userAuth', 'true');
-        localStorage.setItem('userData', JSON.stringify({ name, city, state: stateName, mobile }));
-        window.location.href = "/dashboard";
-      }, 1000);
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('userAuth', 'true');
+          localStorage.setItem('token', data.access_token);
+          localStorage.setItem('userData', JSON.stringify({ email }));
+          window.location.href = "/dashboard";
+        } else {
+          setError("Invalid email or password");
+        }
+      } catch (err) {
+        setError("Failed to connect to server");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setError("Please fill in both email and password");
     }
   };
 
@@ -51,94 +54,46 @@ export default function LoginPage() {
 
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-            <span className="text-4xl">📱</span>
+            <span className="text-4xl">🔐</span>
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">Welcome</h1>
-          <p className="text-slate-400">Login securely with your mobile</p>
+          <h1 className="text-3xl font-black text-white mb-2">Welcome Back</h1>
+          <p className="text-slate-400">Login securely with your account</p>
         </div>
 
-        {step === 1 ? (
-          <form onSubmit={handleSendOTP} className="space-y-4">
-            <div>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors"
-                placeholder="Full Name"
-                required
-              />
-            </div>
-            <div className="flex gap-4">
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-1/2 bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors"
-                placeholder="City"
-                required
-              />
-              <input
-                type="text"
-                value={stateName}
-                onChange={(e) => setStateName(e.target.value)}
-                className="w-1/2 bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors"
-                placeholder="State"
-                required
-              />
-            </div>
-            <div>
-              <div className="flex bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden focus-within:border-emerald-500 transition-colors">
-                <div className="bg-slate-900 px-4 flex items-center justify-center border-r border-slate-800">
-                  <span className="text-slate-400 font-bold">+91</span>
-                </div>
-                <input
-                  type="tel"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className="w-full bg-transparent text-white px-4 py-3 focus:outline-none text-lg font-bold tracking-wider"
-                  placeholder="Mobile Number"
-                  required
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={loading || mobile.length < 10}
-              className="w-full bg-emerald-500 text-white font-bold rounded-2xl px-4 py-4 hover:bg-emerald-400 transition-colors disabled:opacity-50 text-lg shadow-lg shadow-emerald-500/20"
-            >
-              {loading ? "Sending OTP..." : "Get OTP"}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOTP} className="space-y-6">
-            <div>
-              <p className="text-center text-slate-400 mb-4 text-sm">OTP sent to +91 {mobile}</p>
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-4 focus:outline-none focus:border-emerald-500 transition-colors text-center text-3xl font-bold tracking-[1em]"
-                placeholder="••••"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading || otp.length < 4}
-              className="w-full bg-emerald-500 text-white font-bold rounded-2xl px-4 py-4 hover:bg-emerald-400 transition-colors disabled:opacity-50 text-lg shadow-lg shadow-emerald-500/20"
-            >
-              {loading ? "Verifying..." : "Verify & Login"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="w-full text-slate-400 font-medium py-2 hover:text-white transition-colors"
-            >
-              Change Number
-            </button>
-          </form>
-        )}
+        <form onSubmit={handleLogin} className="space-y-4">
+          {error && <p className="text-red-500 text-sm text-center font-semibold">{error}</p>}
+          <div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors"
+              placeholder="Email Address"
+              required
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-colors"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-emerald-500 text-white font-bold rounded-2xl px-4 py-4 hover:bg-emerald-400 transition-colors disabled:opacity-50 text-lg shadow-lg shadow-emerald-500/20"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+        
+        <div className="mt-6 text-center text-slate-400 text-sm">
+          Use <span className="text-emerald-400">traveler@yatrasangi.com</span> and <span className="text-emerald-400">password123</span> for testing
+        </div>
       </div>
     </div>
   );

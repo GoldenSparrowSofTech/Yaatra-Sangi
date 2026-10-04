@@ -9,33 +9,28 @@ export class HotelsService {
     let whereClause = {};
     if (search) {
       whereClause = {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { address: { contains: search, mode: 'insensitive' } },
-        ],
+        name: { contains: search, mode: 'insensitive' },
       };
     }
     
     const hotels = await this.prisma.hotel.findMany({
       where: whereClause,
-      include: { destination: true, roomTypes: true },
+      include: { destination: true },
     });
 
     // Map DB data to match frontend format
     return hotels.map((hotel: any) => {
-      // Find the cheapest room for base price
-      const price = hotel.roomTypes && hotel.roomTypes.length > 0 
-        ? Math.min(...hotel.roomTypes.map((rt: any) => Number(rt.basePrice))) 
-        : 5000; // Default fallback price
+      // Use price from DB if available, else fallback
+      const price = hotel.price ? parseInt(hotel.price.replace(/\D/g, '')) || 5000 : 5000;
 
       return {
-        id: hotel.id,
+        id: hotel.id.toString(),
         name: hotel.name,
-        location: hotel.address + (hotel.destination ? `, ${hotel.destination.name}` : ''),
-        rating: 4.5, // Default for now
+        location: hotel.destination ? `${hotel.destination.name}, ${hotel.destination.state}` : '',
+        rating: hotel.rating || 4.5,
         reviews: 120, // Default for now
         price: price,
-        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Default image
+        image: hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         amenities: ['Pool', 'WiFi'], // Default amenities
         featured: false,
       };
@@ -44,8 +39,8 @@ export class HotelsService {
 
   async findOne(id: string) {
     const hotel = await this.prisma.hotel.findUnique({
-      where: { id },
-      include: { destination: true, roomTypes: true }
+      where: { id: parseInt(id) },
+      include: { destination: true }
     });
     if (!hotel) {
       throw new NotFoundException(`Hotel with ID ${id} not found`);

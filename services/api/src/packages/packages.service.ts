@@ -1,11 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class PackagesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return await this.prisma.tourPackage.findMany();
+    const packages = await this.prisma.package.findMany();
+    return packages.map(p => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.name,
+      duration: p.duration,
+      price: p.price,
+      image: p.image,
+      rating: p.rating,
+      reviews: 124, // Mock
+      features: JSON.parse(p.highlights),
+      vendorName: 'Local Agent'
+    }));
   }
 }

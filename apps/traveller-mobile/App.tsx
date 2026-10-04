@@ -4,7 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { io, Socket } from 'socket.io-client';
 import { WebView } from 'react-native-webview';
 const isWeb = Platform.OS === 'web';
-const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3004' : 'http://192.168.1.111:3004');
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3001' : 'https://d658770164065b.lhr.life');
 
 // --- TYPES ---
 interface Destination {
@@ -556,7 +556,7 @@ const RestaurantsScreen = () => {
   ];
 
   useEffect(() => {
-    fetch('EXPO_PUBLIC_API_URL/restaurants')
+    fetch(`${EXPO_PUBLIC_API_URL}/restaurants`)
       .then(res => res.json())
       .then(data => setRestaurants(data && data.length > 0 ? data : fallbackRestaurants))
       .catch(() => setRestaurants(fallbackRestaurants))
@@ -615,7 +615,7 @@ const PackagesScreen = () => {
   ];
 
   useEffect(() => {
-    fetch('EXPO_PUBLIC_API_URL/packages')
+    fetch(`${EXPO_PUBLIC_API_URL}/packages`)
       .then(res => res.json())
       .then(data => setPackages(data && data.length > 0 ? data : fallbackPackages))
       .catch(() => setPackages(fallbackPackages))
@@ -1103,27 +1103,27 @@ const GenericListScreen = ({ endpoint, title, icon, subtitle }: { endpoint: stri
   );
 };
 
-const LocalRidesScreen = () => {
-  const searchCities = initialSearch ? initialSearch.split(',') : [];
+const LocalRidesScreen = ({ user }: { user?: any }) => {
+  const searchCities = []; // removed initialSearch dependency for simplicity if it was global
   const [pickup, setPickup] = useState(searchCities.length > 0 ? searchCities[0] : '');
   const [drop, setDrop] = useState('');
   const [step, setStep] = useState<'location' | 'select_vehicle' | 'searching' | 'accepted'>('location');
-  const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' |useState<'bike' | 'auto' | 'cab' | 'ambulance'>('bike');
+  const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' | 'cab' | 'ambulance'>('bike');
   
   const [acceptedDriver, setAcceptedDriver] = useState<any | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Note: Use your machine's local IP (e.g., 192.168.x.x) if testing on physical device
-    const newSocket = io('http://localhost:3004');
+    // Connect using the dynamic API URL
+    const newSocket = io(EXPO_PUBLIC_API_URL);
     setSocket(newSocket);
 
     newSocket.on('ride_requested', (data) => {
       setBookingId(data.id);
       // Simulate driver acceptance
       setTimeout(() => {
-         newSocket.emit('accept_ride', { bookingId: data.id, driverId: "dummy-mobile-driver" });
+         newSocket.emit('accept_ride', { bookingId: data.id, driverId: "partner@yatrasangi.com" });
       }, 4000);
     });
 
@@ -1137,13 +1137,13 @@ const LocalRidesScreen = () => {
       const handleStatusUpdate = (data: any) => {
          if (data.status === 'ACCEPTED') {
            setAcceptedDriver({
-             driverName: data.assignedRide?.driverName || 'Mobile Captain',
-             vehicleType: data.assignedRide?.vehicleType || 'Auto',
-             vehicleModel: data.assignedRide?.vehicleModel || 'Bajaj RE',
-             vehicleNumber: data.assignedRide?.vehicleNumber || 'GJ01-XX-9999',
-             rating: data.assignedRide?.rating || 4.9,
+             driverName: data.driverId || 'Mobile Captain',
+             vehicleType: data.vehicleType || 'Auto',
+             vehicleModel: 'Bajaj RE',
+             vehicleNumber: 'GJ01-XX-9999',
+             rating: 4.9,
              otp: data.otpPin || '5678',
-             contactPhone: data.assignedRide?.contactPhone || '+919876543210',
+             contactPhone: '+919876543210',
              image: 'https://images.unsplash.com/photo-1593081045266-9a5c898b671a?auto=format&fit=crop&q=80',
            });
            setStep('accepted');
@@ -1157,7 +1157,7 @@ const LocalRidesScreen = () => {
   const handleBookRide = () => {
     if (socket) {
       setStep('searching');
-      socket.emit('request_ride', { userId: "mobile-user", pickup, drop, vehicleType: selectedVehicle });
+      socket.emit('request_ride', { userId: user?.email || "guest@yatrasangi.com", pickup, drop, vehicleType: selectedVehicle });
     }
   };
 
@@ -1470,34 +1470,36 @@ const PartnerDashboardScreen = () => {
 
 // --- MAIN APP ---
 const TravelerLoginScreen = ({ onLogin }: { onLogin: (user: any) => void }) => {
-  const [step, setStep] = useState(1);
-  const [mobile, setMobile] = useState("");
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
-  const [stateName, setStateName] = useState("");
-  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSendOTP = () => {
-    if (mobile.length >= 10 && name.trim() !== "" && city.trim() !== "" && stateName.trim() !== "") {
+  const handleLogin = async () => {
+    if (email.trim() !== "" && password.trim() !== "") {
       setLoading(true);
-      setTimeout(() => {
+      setError("");
+      try {
+        const response = await fetch(`${EXPO_PUBLIC_API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert("Login Successful!");
+          onLogin({ email, token: data.access_token });
+        } else {
+          setError("Invalid email or password");
+        }
+      } catch (err) {
+        setError("Failed to connect to server");
+      } finally {
         setLoading(false);
-        alert(`Mock SMS: Your YatraSangi OTP is 123456`);
-        setStep(2);
-      }, 1000);
+      }
     } else {
-      alert("Please fill all details and enter a valid 10-digit mobile number");
-    }
-  };
-
-  const handleVerifyOTP = () => {
-    if (otp.length >= 4) {
-      setLoading(true);
-      setTimeout(() => {
-        alert("Login Successful!");
-        onLogin({ name, city, state: stateName, mobile });
-      }, 1000);
+      setError("Please fill in both email and password");
     }
   };
 
@@ -1510,75 +1512,45 @@ const TravelerLoginScreen = ({ onLogin }: { onLogin: (user: any) => void }) => {
       
       <View style={{ width: '90%', maxWidth: 400, backgroundColor: '#0f172a', padding: 30, borderRadius: 24, borderWidth: 1, borderColor: '#1e293b', elevation: 10 }}>
         <View style={{ width: 80, height: 80, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: 40, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.2)' }}>
-          <Text style={{ fontSize: 40 }}>📱</Text>
+          <Text style={{ fontSize: 40 }}>🔐</Text>
         </View>
-        <Text style={{ fontSize: 28, fontWeight: '900', color: 'white', textAlign: 'center', marginBottom: 5 }}>Welcome</Text>
-        <Text style={{ color: '#94a3b8', textAlign: 'center', marginBottom: 30 }}>Login securely with your mobile</Text>
+        <Text style={{ fontSize: 28, fontWeight: '900', color: 'white', textAlign: 'center', marginBottom: 5 }}>Welcome Back</Text>
+        <Text style={{ color: '#94a3b8', textAlign: 'center', marginBottom: 30 }}>Login securely with your account</Text>
 
-        {step === 1 ? (
-          <View style={{ gap: 20 }}>
-              <TextInput
-                value={name}
-                onChangeText={setName}
-                placeholder="Full Name"
-                placeholderTextColor="#475569"
-                style={{ backgroundColor: '#020617', color: 'white', fontSize: 18, paddingVertical: 15, paddingHorizontal: 15, borderRadius: 16, borderWidth: 1, borderColor: '#1e293b' }}
-              />
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                <TextInput
-                  value={city}
-                  onChangeText={setCity}
-                  placeholder="City"
-                  placeholderTextColor="#475569"
-                  style={{ flex: 1, backgroundColor: '#020617', color: 'white', fontSize: 18, paddingVertical: 15, paddingHorizontal: 15, borderRadius: 16, borderWidth: 1, borderColor: '#1e293b' }}
-                />
-                <TextInput
-                  value={stateName}
-                  onChangeText={setStateName}
-                  placeholder="State"
-                  placeholderTextColor="#475569"
-                  style={{ flex: 1, backgroundColor: '#020617', color: 'white', fontSize: 18, paddingVertical: 15, paddingHorizontal: 15, borderRadius: 16, borderWidth: 1, borderColor: '#1e293b' }}
-                />
-              </View>
-              <View style={{ flexDirection: 'row', backgroundColor: '#020617', borderRadius: 16, borderWidth: 1, borderColor: '#1e293b', overflow: 'hidden' }}>
-                <View style={{ backgroundColor: '#0f172a', paddingHorizontal: 20, justifyContent: 'center', borderRightWidth: 1, borderRightColor: '#1e293b' }}>
-                  <Text style={{ color: '#94a3b8', fontWeight: 'bold', fontSize: 18 }}>+91</Text>
-                </View>
-                <TextInput
-                  value={mobile}
-                  onChangeText={(text) => setMobile(text.replace(/[^0-9]/g, '').slice(0, 10))}
-                  keyboardType="phone-pad"
-                  placeholder="Mobile Number"
-                  placeholderTextColor="#475569"
-                  style={{ flex: 1, color: 'white', fontSize: 20, fontWeight: 'bold', paddingVertical: 15, paddingHorizontal: 15, letterSpacing: 2 }}
-                />
-              </View>
-            
-            <TouchableOpacity onPress={handleSendOTP} disabled={loading || mobile.length < 10 || !name || !city || !stateName} style={{ backgroundColor: (mobile.length >= 10 && name && city && stateName) ? '#10b981' : '#334155', paddingVertical: 18, borderRadius: 16, alignItems: 'center', shadowColor: '#10b981', shadowOpacity: 0.3, shadowRadius: 10 }}>
-              {loading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>Get OTP</Text>}
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={{ gap: 20 }}>
-            <Text style={{ color: '#94a3b8', textAlign: 'center' }}>OTP sent to +91 {mobile}</Text>
-            <TextInput
-              value={otp}
-              onChangeText={(text) => setOtp(text.replace(/[^0-9]/g, '').slice(0, 4))}
-              keyboardType="number-pad"
-              placeholder="••••"
-              placeholderTextColor="#475569"
-              style={{ backgroundColor: '#020617', color: 'white', fontSize: 32, fontWeight: 'bold', paddingVertical: 15, textAlign: 'center', borderRadius: 16, borderWidth: 1, borderColor: '#1e293b', letterSpacing: 15 }}
-            />
-            
-            <TouchableOpacity onPress={handleVerifyOTP} disabled={loading || otp.length < 4} style={{ backgroundColor: otp.length >= 4 ? '#10b981' : '#334155', paddingVertical: 18, borderRadius: 16, alignItems: 'center', shadowColor: '#10b981', shadowOpacity: 0.3, shadowRadius: 10 }}>
-              {loading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>Verify & Login</Text>}
-            </TouchableOpacity>
+        <View style={{ gap: 20 }}>
+          {error ? <Text style={{ color: '#ef4444', textAlign: 'center', fontWeight: 'bold' }}>{error}</Text> : null}
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email Address"
+            placeholderTextColor="#475569"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={{ backgroundColor: '#020617', color: 'white', fontSize: 18, paddingVertical: 15, paddingHorizontal: 15, borderRadius: 16, borderWidth: 1, borderColor: '#1e293b' }}
+          />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            placeholderTextColor="#475569"
+            secureTextEntry={true}
+            style={{ backgroundColor: '#020617', color: 'white', fontSize: 18, paddingVertical: 15, paddingHorizontal: 15, borderRadius: 16, borderWidth: 1, borderColor: '#1e293b' }}
+          />
 
-            <TouchableOpacity onPress={() => setStep(1)} style={{ paddingVertical: 10, alignItems: 'center' }}>
-              <Text style={{ color: '#94a3b8', fontSize: 16 }}>Change Number</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          <TouchableOpacity
+            onPress={handleLogin}
+            disabled={loading}
+            style={{ backgroundColor: '#10b981', paddingVertical: 16, borderRadius: 16, alignItems: 'center', marginTop: 10, opacity: loading ? 0.7 : 1 }}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Login</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <Text style={{ color: '#475569', textAlign: 'center', marginTop: 20, fontSize: 12 }}>Use traveler@yatrasangi.com / password123</Text>
       </View>
     </ImageBackground>
   );
@@ -1990,7 +1962,7 @@ const AppContent = () => {
             {currentScreen === 'Cabs' && <CabsScreen initialSearch={searchContext} />}
             {currentScreen === 'Restaurants' && <RestaurantsScreen />}
             {currentScreen === 'Packages' && <PackagesScreen />}
-            {currentScreen === 'Local Rides' && <LocalRidesScreen />}
+            {currentScreen === 'Local Rides' && <LocalRidesScreen user={loggedUser} />}
             {currentScreen === 'PartnerDashboard' && <PartnerDashboardScreen />}
             {currentScreen === 'Settings' && <SettingsScreen />}
             {currentScreen === 'TravelerDashboard' && <TravelerDashboardScreen user={loggedUser} onPlanTrip={() => navigateTo('Trip Planner')} />}

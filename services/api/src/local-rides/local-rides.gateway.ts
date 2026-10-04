@@ -8,7 +8,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { LocalRidesService } from './local-rides.service';
+import { LocalRidesService } from './local-rides.service.js';
 
 @WebSocketGateway({ cors: true })
 export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconnect {

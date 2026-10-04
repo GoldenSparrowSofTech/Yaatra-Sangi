@@ -66,7 +66,7 @@ export default function RestaurantsPage() {
     const fetchRestaurants = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('http://localhost:3004/restaurants');
+        const res = await fetch('http://localhost:3001/restaurants');
         const resList = await res.json();
         
         if (resList && resList.length > 0) {

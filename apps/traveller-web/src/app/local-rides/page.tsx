@@ -16,8 +16,8 @@ export default function LocalRidesPage() {
   const [bookingId, setBookingId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Connect to NestJS WebSocket Gateway (Assumed port 3004)
-    const newSocket = io('http://localhost:3004');
+    // Connect to NestJS WebSocket Gateway
+    const newSocket = io('http://localhost:3001');
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -31,7 +31,7 @@ export default function LocalRidesPage() {
       // FOR DEMO PURPOSES: We simulate a driver accepting it from another client app
       // In a real app, a SEPARATE driver app would receive this broadcast and emit 'accept_ride'
       setTimeout(() => {
-         newSocket.emit('accept_ride', { bookingId: data.id, driverId: "dummy-driver-id" });
+         newSocket.emit('accept_ride', { bookingId: data.id, driverId: "partner@yatrasangi.com" });
       }, 4000);
     });
 
@@ -46,13 +46,13 @@ export default function LocalRidesPage() {
       const handleStatusUpdate = (data: any) => {
          if (data.status === 'ACCEPTED') {
            setAcceptedDriver({
-             driverName: data.assignedRide?.driverName || 'Live Captain',
-             vehicleType: data.assignedRide?.vehicleType || 'Bike',
-             vehicleModel: data.assignedRide?.vehicleModel || 'Honda Activa',
-             vehicleNumber: data.assignedRide?.vehicleNumber || 'GJ01-XX-9999',
-             rating: data.assignedRide?.rating || 4.9,
+             driverName: data.driverId || 'Live Captain',
+             vehicleType: data.vehicleType || 'Bike',
+             vehicleModel: 'Honda Activa',
+             vehicleNumber: 'GJ01-XX-9999',
+             rating: 4.9,
              otp: data.otpPin || '1234',
-             contactPhone: data.assignedRide?.contactPhone || '+919876543210',
+             contactPhone: '+919876543210',
              image: 'https://images.unsplash.com/photo-1593081045266-9a5c898b671a?auto=format&fit=crop&q=80',
            });
            setStep('accepted');
@@ -78,9 +78,19 @@ export default function LocalRidesPage() {
   const handleBookRide = () => {
     setStep('searching');
     if (socket) {
+       let email = "guest-user-id";
+       if (typeof window !== 'undefined') {
+         const userDataString = localStorage.getItem('userData');
+         if (userDataString) {
+           try {
+             const userData = JSON.parse(userDataString);
+             email = userData.email || email;
+           } catch(e) {}
+         }
+       }
        // Emit real-time request to the NestJS backend
        socket.emit('request_ride', {
-         userId: "test-user-id",
+         userId: email,
          pickup,
          drop,
          vehicleType: selectedVehicle

@@ -19,7 +19,7 @@ function TaxiPageContent() {
 
   const fetchTaxis = async () => {
     try {
-      const res = await fetch('http://localhost:3004/taxis');
+      const res = await fetch('http://localhost:3001/taxis');
       const taxiList = await res.json();
       
       if (taxiList && taxiList.length > 0) {
@@ -102,6 +102,7 @@ function TaxiPageContent() {
             </button>
           </div>
         </div>
+      </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 mt-12">
