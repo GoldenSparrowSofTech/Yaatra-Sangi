@@ -39,7 +39,7 @@ interface HomeScreenProps {
   destinations: Destination[];
   onNavigateToDetail: (id: string) => void;
   onStartAI: () => void;
-  onNavigate: (screen: string) => void;
+  onNavigate: (screen: string, context?: string) => void;
 }
 
 interface DestinationsScreenProps {
@@ -368,7 +368,7 @@ const DestinationDetailScreen: React.FC<DestinationDetailProps> = ({ destination
   );
 };
 
-const HotelsScreen = () => {
+const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
   const [hotels, setHotels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -462,7 +462,7 @@ const HotelsScreen = () => {
   );
 };
 
-const CabsScreen = () => {
+const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
   const [cabs, setCabs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -900,10 +900,10 @@ const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string) => v
                   </View>
                 </View>
 
-                <TouchableOpacity onPress={() => onNavigate('Hotels')} style={{ backgroundColor: '#4f46e5', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
+                <TouchableOpacity onPress={() => onNavigate('Hotels', cities.map(c => c.name).join(','))} style={{ backgroundColor: '#4f46e5', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
                   <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Find Hotels on Route</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => onNavigate('Cabs')} style={{ backgroundColor: '#1e293b', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
+                <TouchableOpacity onPress={() => onNavigate('Cabs', cities.map(c => c.name).join(','))} style={{ backgroundColor: '#1e293b', paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginBottom: 12 }}>
                   <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15 }}>Book Taxi</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => Linking.openURL(`https://www.google.com/maps/dir/${cities.map(c => encodeURIComponent(c.name)).join('/')}`)} style={{ backgroundColor: '#2563eb', paddingVertical: 14, borderRadius: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
@@ -1096,7 +1096,8 @@ const GenericListScreen = ({ endpoint, title, icon, subtitle }: { endpoint: stri
 };
 
 const LocalRidesScreen = () => {
-  const [pickup, setPickup] = useState('');
+  const searchCities = initialSearch ? initialSearch.split(',') : [];
+  const [pickup, setPickup] = useState(searchCities.length > 0 ? searchCities[0] : '');
   const [drop, setDrop] = useState('');
   const [step, setStep] = useState<'location' | 'select_vehicle' | 'searching' | 'accepted'>('location');
   const [selectedVehicle, setSelectedVehicle] = useState<'bike' | 'auto' | 'cab'>('bike');
@@ -1749,7 +1750,8 @@ const AppContent = () => {
     return () => subscription.remove();
   }, [currentScreen, selectedDestId, history]);
 
-  const navigateTo = (screen: string) => {
+  const navigateTo = (screen: string, context: string = '') => {
+    setSearchContext(context);
     setHistory(prev => [...prev, currentScreen]);
     setCurrentScreen(screen);
   };
@@ -1924,8 +1926,8 @@ const AppContent = () => {
             {currentScreen === 'Home' && <HomeScreen destinations={apiDestinations} onNavigateToDetail={navigateToDetail} onStartAI={() => navigateTo('Trip Planner')} onNavigate={navigateTo} />}
             {currentScreen === 'Destinations' && <DestinationsScreen destinations={apiDestinations} onNavigateToDetail={navigateToDetail} />}
             {currentScreen === 'Trip Planner' && <AITripPlannerScreen onNavigate={navigateTo} />}
-            {currentScreen === 'Hotels' && <HotelsScreen />}
-            {currentScreen === 'Cabs' && <CabsScreen />}
+            {currentScreen === 'Hotels' && <HotelsScreen initialSearch={searchContext} />}
+            {currentScreen === 'Cabs' && <CabsScreen initialSearch={searchContext} />}
             {currentScreen === 'Restaurants' && <RestaurantsScreen />}
             {currentScreen === 'Packages' && <PackagesScreen />}
             {currentScreen === 'Local Rides' && <LocalRidesScreen />}
