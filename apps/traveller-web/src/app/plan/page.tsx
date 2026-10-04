@@ -393,10 +393,10 @@ export default function PlanTripPage() {
               </div>
 
               <div className="flex flex-col gap-2 mt-6">
-                <Link href="/hotels" className="w-full py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-lg hover:bg-indigo-500 transition-colors text-center shadow-lg shadow-indigo-600/20">
+                <Link href={`/hotels?search=${destinations.map(d => encodeURIComponent(d.name)).join(',')}`} className="w-full py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-lg hover:bg-indigo-500 transition-colors text-center shadow-lg shadow-indigo-600/20">
                   Find Hotels on Route
                 </Link>
-                <Link href="/taxi" className="w-full py-2.5 bg-slate-800 text-white text-sm font-bold rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 text-center flex items-center justify-center">
+                <Link href={`/taxi?search=${destinations.map(d => encodeURIComponent(d.name)).join(',')}`} className="w-full py-2.5 bg-slate-800 text-white text-sm font-bold rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 text-center flex items-center justify-center">
                   Book Taxi
                 </Link>
                 <a href={`https://www.google.com/maps/dir/${destinations.map(d => encodeURIComponent(d.name)).join('/')}`} target="_blank" rel="noreferrer" className="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-500 transition-colors text-center shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2">

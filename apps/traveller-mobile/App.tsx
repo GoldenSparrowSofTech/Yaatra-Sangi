@@ -1864,7 +1864,7 @@ const AppContent = () => {
                 {[
                   { name: 'Home', icon: '🏠', route: 'Home' },
                   { name: 'Destinations', icon: '📍', route: 'Destinations' },
-                  { name: 'AI Trip Planner', icon: '🤖', route: 'AITripPlanner' },
+                  { name: 'AI Trip Planner', icon: '🤖', route: 'Trip Planner' },
                   { name: 'Hotels', icon: '🏨', route: 'Hotels' },
                   { name: 'Outstation Cabs', icon: '🚕', route: 'Cabs' },
                   { name: 'Local Rides', icon: '🛵', route: 'Local Rides' },

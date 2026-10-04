@@ -1,10 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
-export default function TaxiPage() {
-  const [pickup, setPickup] = useState('');
-  const [dropoff, setDropoff] = useState('');
+function TaxiPageContent() {
+  const searchParams = useSearchParams();
+  const searchString = searchParams?.get('search') || '';
+  const searchCities = searchString ? searchString.split(',') : [];
+  
+  const [pickup, setPickup] = useState(searchCities.length > 0 ? searchCities[0] : '');
+  const [dropoff, setDropoff] = useState(searchCities.length > 1 ? searchCities[searchCities.length - 1] : '');
   const [taxis, setTaxis] = useState<any[]>([]);
 
   const fallbackTaxis = [
@@ -162,5 +167,13 @@ export default function TaxiPage() {
       </div>
       </div>
     </main>
+  );
+}
+
+export default function TaxiPage() {
+  return (
+    <Suspense fallback={<div className="pt-24 text-center text-white">Loading...</div>}>
+      <TaxiPageContent />
+    </Suspense>
   );
 }
