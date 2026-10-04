@@ -84,10 +84,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
       <ScrollView contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         
         {/* Floating Logo Top Left (Below Header) */}
-        <View style={{ position: 'absolute', top: 20, left: 20, zIndex: 50 }}>
+        <View style={{ position: 'absolute', top: 10, left: 20, zIndex: 50 }}>
           <Image 
             source={require('./assets/yatrasangi_logo.jpeg')} 
-            style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' }} 
+            style={{ width: 80, height: 80, borderRadius: 12, borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' }} 
           />
         </View>
 

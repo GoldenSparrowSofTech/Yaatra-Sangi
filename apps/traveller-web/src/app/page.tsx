@@ -17,11 +17,11 @@ export default function Home() {
       <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-500 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-blob animation-delay-4000"></div>
 
       {/* Floating Logo Top Left (Below Header) */}
-      <div className="absolute top-28 left-6 md:left-12 z-50 hidden sm:block">
+      <div className="absolute top-20 left-6 md:left-12 z-50 hidden sm:block">
         <img 
           src="/yatrasangi_logo.jpeg" 
           alt="YatraSangi Logo" 
-          className="w-20 h-20 md:w-28 md:h-28 object-cover rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] border-2 border-white/10" 
+          className="w-20 h-20 md:w-28 md:h-28 object-cover rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] border-2 border-white/10" 
         />
       </div>
 
