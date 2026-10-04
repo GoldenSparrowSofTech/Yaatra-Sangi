@@ -162,7 +162,7 @@ function HotelsPageContent() {
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
-            <button className="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20 h-[50px]">
+            <button onClick={() => alert('Search applied! Please wait.')} className="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20 h-[50px] active:scale-95">
               Search
             </button>
           </div>
@@ -253,7 +253,7 @@ function HotelsPageContent() {
                       <span className="text-2xl font-bold text-white">₹{hotel.price.toLocaleString('en-IN')}</span>
                       <span className="text-slate-500 text-xs block">/ night + taxes</span>
                     </div>
-                    <button className="px-6 py-2.5 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition-colors shadow-lg">
+                    <button onClick={() => alert('Booking Confirmed! Your stay is booked.')} className="px-6 py-2.5 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition-colors shadow-lg active:scale-95">
                       Book Now
                     </button>
                   </div>

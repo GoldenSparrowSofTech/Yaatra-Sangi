@@ -458,7 +458,7 @@ const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
               
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                 <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>₹{hotel.price}<Text style={{ fontSize: 12, color: '#94a3b8', fontWeight: 'normal' }}> / night</Text></Text>
-                <TouchableOpacity style={{ backgroundColor: '#4f46e5', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
+                <TouchableOpacity onPress={() => Alert.alert('Booking Confirmed', 'Your hotel room has been successfully booked!')} style={{ backgroundColor: '#4f46e5', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
                   <Text style={{ color: 'white', fontWeight: 'bold' }}>Book Now</Text>
                 </TouchableOpacity>
               </View>
@@ -505,7 +505,7 @@ const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
         <View style={{ backgroundColor: 'rgba(30, 41, 59, 0.8)', padding: 20, borderRadius: 16, borderWidth: 1, borderColor: '#334155' }}>
           <TextInput placeholder="Pickup Location" placeholderTextColor="#64748b" style={{ backgroundColor: '#020617', color: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#334155' }} />
           <TextInput placeholder="Drop-off Location" placeholderTextColor="#64748b" style={{ backgroundColor: '#020617', color: 'white', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#334155' }} />
-          <TouchableOpacity style={{ backgroundColor: '#4f46e5', padding: 15, borderRadius: 8, alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => Alert.alert('Searching...', 'Finding the best cabs for your route.')} style={{ backgroundColor: '#4f46e5', padding: 15, borderRadius: 8, alignItems: 'center' }}>
             <Text style={{ color: 'white', fontWeight: 'bold' }}>Find Cabs</Text>
           </TouchableOpacity>
         </View>
@@ -532,7 +532,7 @@ const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
                 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                   <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>₹{cab.price}<Text style={{ fontSize: 10, color: '#94a3b8', fontWeight: 'normal' }}>{cab.perKm ? '/km' : '/trip'}</Text></Text>
-                  <TouchableOpacity style={{ backgroundColor: '#4f46e5', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 8 }}>
+                  <TouchableOpacity onPress={() => Alert.alert('Booking Confirmed', 'Your cab has been booked successfully!')} style={{ backgroundColor: '#4f46e5', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 8 }}>
                     <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>Book</Text>
                   </TouchableOpacity>
                 </View>
@@ -592,7 +592,7 @@ const RestaurantsScreen = () => {
               
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5, borderTopWidth: 1, borderTopColor: '#334155', paddingTop: 15 }}>
                 <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>₹{rest.avgCostForTwo} <Text style={{ fontSize: 12, color: '#94a3b8', fontWeight: 'normal' }}>for two</Text></Text>
-                <TouchableOpacity style={{ backgroundColor: '#f43f5e', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
+                <TouchableOpacity onPress={() => Alert.alert('Menu', 'Restaurant menu will be loaded here.')} style={{ backgroundColor: '#f43f5e', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
                   <Text style={{ color: 'white', fontWeight: 'bold' }}>View Menu</Text>
                 </TouchableOpacity>
               </View>
@@ -659,7 +659,7 @@ const PackagesScreen = () => {
                   <Text style={{ color: '#94a3b8', fontSize: 12, marginBottom: 2 }}>Starting from</Text>
                   <Text style={{ color: 'white', fontSize: 24, fontWeight: 'black' }}>₹{pkg.price.toLocaleString()}</Text>
                 </View>
-                <TouchableOpacity style={{ backgroundColor: '#10b981', paddingHorizontal: 25, paddingVertical: 12, borderRadius: 12 }}>
+                <TouchableOpacity onPress={() => Alert.alert('Request Sent', 'Vendor will contact you with itinerary details.')} style={{ backgroundColor: '#10b981', paddingHorizontal: 25, paddingVertical: 12, borderRadius: 12 }}>
                   <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>Book Now</Text>
                 </TouchableOpacity>
               </View>
@@ -1056,7 +1056,7 @@ const CustomRouteScreen = () => {
       </View>
 
       {cities.length > 1 && (
-        <TouchableOpacity style={{ backgroundColor: '#4f46e5', padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 30 }}>
+        <TouchableOpacity onPress={handleGenerate} style={{ backgroundColor: '#4f46e5', padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 30 }}>
           <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Calculate Fare & Route Map</Text>
         </TouchableOpacity>
       )}
@@ -1451,7 +1451,7 @@ const PartnerDashboardScreen = () => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
           <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>My Listed Assets ({assets.length})</Text>
-          <TouchableOpacity style={{ backgroundColor: '#6366f1', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20 }}>
+          <TouchableOpacity onPress={() => Alert.alert('Add Asset', 'This feature is coming soon!')} style={{ backgroundColor: '#6366f1', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20 }}>
             <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>+ Add Asset</Text>
           </TouchableOpacity>
         </View>
