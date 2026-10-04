@@ -86,7 +86,7 @@ export default function TourPackagesPage() {
                     <p className="text-slate-400 text-sm mb-1">Starting from</p>
                     <p className="text-3xl font-black text-white">₹{pkg.price.toLocaleString()}</p>
                   </div>
-                  <button className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-lg shadow-emerald-500/20">
+                  <button onClick={() => alert('Tour Package Booking request has been sent! The vendor will contact you with itinerary details.')} className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-lg shadow-emerald-500/20 active:scale-95">
                     Book Now
                   </button>
                 </div>
