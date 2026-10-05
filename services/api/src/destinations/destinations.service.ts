@@ -37,7 +37,6 @@ export class DestinationsService {
       where: {
         name: {
           contains: query,
-          mode: 'insensitive',
         },
       },
     });

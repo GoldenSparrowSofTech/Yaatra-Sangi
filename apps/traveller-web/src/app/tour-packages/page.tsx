@@ -3,11 +3,16 @@ import { useState, useEffect } from 'react';
 
 export default function TourPackagesPage() {
   const [packages, setPackages] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch('http://localhost:3001/packages');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const url = new URL(`${apiUrl}/packages`);
+        if (searchQuery) url.searchParams.append('location', searchQuery);
+        
+        const res = await fetch(url.toString());
         const pkgList = await res.json();
         
         if (pkgList && pkgList.length > 0) {
@@ -25,8 +30,11 @@ export default function TourPackagesPage() {
       }
     };
     
-    fetchPackages();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      fetchPackages();
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   return (
     <main 
@@ -41,9 +49,19 @@ export default function TourPackagesPage() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         <div className="text-center mb-16 animate-fade-in-up">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-lg">Exclusive Tour Packages</h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto font-light drop-shadow-md">
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto font-light drop-shadow-md mb-8">
             Directly from local travel agents. 0% Commission. Best Prices Guaranteed.
           </p>
+          
+          <div className="max-w-xl mx-auto flex gap-2">
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search destination (e.g. Goa, Manali)"
+              className="flex-1 bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

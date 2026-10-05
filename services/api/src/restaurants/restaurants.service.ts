@@ -5,8 +5,12 @@ import { PrismaService } from '../prisma/prisma.service.js';
 export class RestaurantsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    const restaurants = await this.prisma.restaurant.findMany();
+  async findAll(location?: string) {
+    let whereClause = {};
+    if (location) {
+      whereClause = { location: { contains: location } };
+    }
+    const restaurants = await this.prisma.restaurant.findMany({ where: whereClause });
     return restaurants.map(r => ({
       ...r,
       features: JSON.parse(r.features)

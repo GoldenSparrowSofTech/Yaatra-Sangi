@@ -9,7 +9,10 @@ export class HotelsService {
     let whereClause = {};
     if (search) {
       whereClause = {
-        name: { contains: search, mode: 'insensitive' },
+        OR: [
+          { name: { contains: search } },
+          { destination: { name: { contains: search } } }
+        ]
       };
     }
     

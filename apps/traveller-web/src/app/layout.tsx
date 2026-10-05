@@ -29,6 +29,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (localStorage.getItem('theme') === 'light') {
+              document.documentElement.classList.add('light-theme-forced');
+            }
+          `
+        }} />
+      </head>
       <body className={`${inter.className} bg-slate-950 text-slate-50 antialiased`}>
         {/* Navigation Bar */}
         <header className="fixed top-0 w-full z-50 bg-slate-950/70 backdrop-blur-md border-b border-white/10 safe-pt">

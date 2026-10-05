@@ -6,7 +6,11 @@ export class TaxisService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(pickup?: string, dropoff?: string) {
-    const taxis = await this.prisma.taxi.findMany();
+    let whereClause = {};
+    if (pickup) {
+      whereClause = { location: { contains: pickup } };
+    }
+    const taxis = await this.prisma.taxi.findMany({ where: whereClause });
     return taxis.map(t => ({
       ...t,
       features: JSON.parse(t.features)

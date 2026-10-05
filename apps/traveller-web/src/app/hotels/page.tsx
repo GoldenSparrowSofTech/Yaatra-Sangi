@@ -83,7 +83,11 @@ function HotelsPageContent() {
     const fetchHotels = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('http://localhost:3004/hotels');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const url = new URL(`${apiUrl}/hotels`);
+        if (searchQuery) url.searchParams.append('search', searchQuery);
+        
+        const res = await fetch(url.toString());
         const hotelList = await res.json();
         
         if (hotelList && hotelList.length > 0) {

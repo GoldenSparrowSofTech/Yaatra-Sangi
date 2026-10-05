@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, ImageBackground, TouchableOpacity, StatusBar, TextInput, ActivityIndicator, Platform, Linking, Alert, BackHandler, Modal } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, ImageBackground, TouchableOpacity, StatusBar, TextInput, ActivityIndicator, Platform, Linking, Alert, BackHandler, Modal, Switch } from 'react-native';
+import { t } from './translations';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { io, Socket } from 'socket.io-client';
 import { WebView } from 'react-native-webview';
 const isWeb = Platform.OS === 'web';
-const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3001' : 'https://d658770164065b.lhr.life');
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3001' : 'https://yatrasangi-demo.loca.lt');
+
+// Global override to bypass Localtunnel splash screen for all API requests
+const originalFetch = (globalThis as any).fetch;
+(globalThis as any).fetch = async (url: any, options: any) => {
+  if (typeof url === 'string' && url.includes('loca.lt')) {
+    const customOptions = options || {};
+    customOptions.headers = {
+      ...customOptions.headers,
+      'Bypass-Tunnel-Reminder': 'true'
+    };
+    return originalFetch(url, customOptions);
+  }
+  return originalFetch(url, options);
+};
 
 // --- TYPES ---
 interface Destination {
@@ -377,7 +392,9 @@ const DestinationDetailScreen: React.FC<DestinationDetailProps> = ({ destination
 };
 
 const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
+  const [searchQuery, setSearchQuery] = useState('');
   const [hotels, setHotels] = useState<any[]>([]);
+  const [allHotels, setAllHotels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fallbackHotels = [
@@ -417,23 +434,43 @@ const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
     fetch(`${EXPO_PUBLIC_API_URL}/hotels`)
       .then(res => res.json())
       .then(data => {
-        if (data && data.length > 0) {
-          setHotels(data);
-        } else {
-          setHotels(fallbackHotels);
-        }
+        const hList = (data && data.length > 0) ? data : fallbackHotels;
+        setAllHotels(hList);
+        setHotels(hList);
       })
       .catch(() => {
         console.log('Backend not reachable, using fallback data');
+        setAllHotels(fallbackHotels);
         setHotels(fallbackHotels);
       })
       .finally(() => setLoading(false));
   }, []);
 
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    if (text) {
+      const filtered = allHotels.filter((h: any) => 
+        (h.name && h.name.toLowerCase().includes(text.toLowerCase())) || 
+        (h.location && h.location.toLowerCase().includes(text.toLowerCase()))
+      );
+      setHotels(filtered);
+    } else {
+      setHotels(allHotels);
+    }
+  };
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
       <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 5 }}>Luxury <Text style={{ color: '#10b981' }}>Hotels</Text></Text>
-      <Text style={{ color: '#94a3b8', marginBottom: 20 }}>Find the best stays curated for your comfort.</Text>
+      <Text style={{ color: '#94a3b8', marginBottom: 15 }}>Find the best stays curated for your comfort.</Text>
+      
+      <TextInput 
+        value={searchQuery}
+        onChangeText={handleSearch}
+        placeholder="Search by hotel name or city..." 
+        placeholderTextColor="#64748b" 
+        style={{ backgroundColor: '#1e293b', color: 'white', padding: 15, borderRadius: 12, marginBottom: 20, borderWidth: 1, borderColor: '#334155' }} 
+      />
       
       {loading ? (
         <ActivityIndicator size="large" color="#10b981" style={{ marginTop: 50 }} />
@@ -471,7 +508,11 @@ const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
 };
 
 const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
+  const searchCities = initialSearch ? initialSearch.split(',') : [];
+  const [pickup, setPickup] = useState(searchCities.length > 0 ? searchCities[0] : '');
+  const [dropoff, setDropoff] = useState(searchCities.length > 1 ? searchCities[searchCities.length - 1] : '');
   const [cabs, setCabs] = useState<any[]>([]);
+  const [allCabs, setAllCabs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fallbackCabs = [
@@ -479,19 +520,44 @@ const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
     { id: '2', name: 'Shiv Taxi Service', type: 'Sedan (Dzire)', location: 'Mumbai', rating: 4.6, price: 12, perKm: true, image: 'https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&w=800&q=80' },
   ];
 
-  useEffect(() => {
+  const fetchCabs = () => {
+    setLoading(true);
     fetch(`${EXPO_PUBLIC_API_URL}/taxis`)
       .then(res => res.json())
       .then(data => {
-        if (data && data.length > 0) setCabs(data);
-        else setCabs(fallbackCabs);
+        let taxiList = (data && data.length > 0) ? data : fallbackCabs;
+        setAllCabs(taxiList);
+        
+        if (pickup || dropoff) {
+          taxiList = taxiList.filter((t: any) => 
+            t.location.toLowerCase().includes(pickup.toLowerCase()) || 
+            t.location.toLowerCase().includes(dropoff.toLowerCase())
+          );
+        }
+        setCabs(taxiList);
       })
       .catch(() => {
-        console.log('Backend not reachable, using fallback data for cabs');
+        setAllCabs(fallbackCabs);
         setCabs(fallbackCabs);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchCabs();
   }, []);
+
+  const handleSearch = () => {
+    if (pickup || dropoff) {
+      const filtered = allCabs.filter((t: any) => 
+        t.location.toLowerCase().includes(pickup.toLowerCase()) || 
+        t.location.toLowerCase().includes(dropoff.toLowerCase())
+      );
+      setCabs(filtered);
+    } else {
+      setCabs(allCabs);
+    }
+  };
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
@@ -503,9 +569,9 @@ const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
         <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 20 }}>Book Your <Text style={{ color: '#6366f1' }}>Ride</Text></Text>
         
         <View style={{ backgroundColor: 'rgba(30, 41, 59, 0.8)', padding: 20, borderRadius: 16, borderWidth: 1, borderColor: '#334155' }}>
-          <TextInput placeholder="Pickup Location" placeholderTextColor="#64748b" style={{ backgroundColor: '#020617', color: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#334155' }} />
-          <TextInput placeholder="Drop-off Location" placeholderTextColor="#64748b" style={{ backgroundColor: '#020617', color: 'white', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#334155' }} />
-          <TouchableOpacity onPress={() => Alert.alert('Searching...', 'Finding the best cabs for your route.')} style={{ backgroundColor: '#4f46e5', padding: 15, borderRadius: 8, alignItems: 'center' }}>
+          <TextInput value={pickup} onChangeText={setPickup} placeholder="Pickup Location" placeholderTextColor="#64748b" style={{ backgroundColor: '#020617', color: 'white', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#334155' }} />
+          <TextInput value={dropoff} onChangeText={setDropoff} placeholder="Drop-off Location" placeholderTextColor="#64748b" style={{ backgroundColor: '#020617', color: 'white', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#334155' }} />
+          <TouchableOpacity onPress={handleSearch} style={{ backgroundColor: '#4f46e5', padding: 15, borderRadius: 8, alignItems: 'center' }}>
             <Text style={{ color: 'white', fontWeight: 'bold' }}>Find Cabs</Text>
           </TouchableOpacity>
         </View>
@@ -546,7 +612,9 @@ const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) => {
 };
 
 const RestaurantsScreen = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [allRestaurants, setAllRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fallbackRestaurants = [
@@ -558,16 +626,44 @@ const RestaurantsScreen = () => {
   useEffect(() => {
     fetch(`${EXPO_PUBLIC_API_URL}/restaurants`)
       .then(res => res.json())
-      .then(data => setRestaurants(data && data.length > 0 ? data : fallbackRestaurants))
-      .catch(() => setRestaurants(fallbackRestaurants))
+      .then(data => {
+        const restList = (data && data.length > 0) ? data : fallbackRestaurants;
+        setAllRestaurants(restList);
+        setRestaurants(restList);
+      })
+      .catch(() => {
+        setAllRestaurants(fallbackRestaurants);
+        setRestaurants(fallbackRestaurants);
+      })
       .finally(() => setLoading(false));
   }, []);
 
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    if (text) {
+      const filtered = allRestaurants.filter((r: any) => 
+        r.name.toLowerCase().includes(text.toLowerCase()) || 
+        r.location.toLowerCase().includes(text.toLowerCase())
+      );
+      setRestaurants(filtered);
+    } else {
+      setRestaurants(allRestaurants);
+    }
+  };
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-      <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 5 }}>Local <Text style={{ color: '#f43f5e' }}>Restaurants</Text></Text>
-      <Text style={{ color: '#94a3b8', marginBottom: 20 }}>Discover top-rated food near your destination.</Text>
+      <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 5, marginTop: 20 }}>Local <Text style={{ color: '#f43f5e' }}>Restaurants</Text></Text>
+      <Text style={{ color: '#94a3b8', marginBottom: 15 }}>Discover top-rated food near your destination.</Text>
       
+      <TextInput 
+        value={searchQuery}
+        onChangeText={handleSearch}
+        placeholder="Search by restaurant name or city..." 
+        placeholderTextColor="#64748b" 
+        style={{ backgroundColor: '#1e293b', color: 'white', padding: 15, borderRadius: 12, marginBottom: 20, borderWidth: 1, borderColor: '#334155' }} 
+      />
+
       {loading ? (
         <ActivityIndicator size="large" color="#f43f5e" />
       ) : (
@@ -592,7 +688,7 @@ const RestaurantsScreen = () => {
               
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5, borderTopWidth: 1, borderTopColor: '#334155', paddingTop: 15 }}>
                 <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>₹{rest.avgCostForTwo} <Text style={{ fontSize: 12, color: '#94a3b8', fontWeight: 'normal' }}>for two</Text></Text>
-                <TouchableOpacity onPress={() => Alert.alert('Menu', 'Restaurant menu will be loaded here.')} style={{ backgroundColor: '#f43f5e', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
+                <TouchableOpacity onPress={() => Alert.alert('Menu', `Opening menu for ${rest.name}...`)} style={{ backgroundColor: '#f43f5e', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
                   <Text style={{ color: 'white', fontWeight: 'bold' }}>View Menu</Text>
                 </TouchableOpacity>
               </View>
@@ -605,7 +701,9 @@ const RestaurantsScreen = () => {
 };
 
 const PackagesScreen = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const [packages, setPackages] = useState<any[]>([]);
+  const [allPackages, setAllPackages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fallbackPackages = [
@@ -617,15 +715,43 @@ const PackagesScreen = () => {
   useEffect(() => {
     fetch(`${EXPO_PUBLIC_API_URL}/packages`)
       .then(res => res.json())
-      .then(data => setPackages(data && data.length > 0 ? data : fallbackPackages))
-      .catch(() => setPackages(fallbackPackages))
+      .then(data => {
+        const pList = data && data.length > 0 ? data : fallbackPackages;
+        setAllPackages(pList);
+        setPackages(pList);
+      })
+      .catch(() => {
+        setAllPackages(fallbackPackages);
+        setPackages(fallbackPackages);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    if (text) {
+      const filtered = allPackages.filter((p: any) => 
+        (p.title && p.title.toLowerCase().includes(text.toLowerCase())) || 
+        (p.vendorName && p.vendorName.toLowerCase().includes(text.toLowerCase()))
+      );
+      setPackages(filtered);
+    } else {
+      setPackages(allPackages);
+    }
+  };
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
       <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 5 }}>Exclusive <Text style={{ color: '#10b981' }}>Packages</Text></Text>
-      <Text style={{ color: '#94a3b8', marginBottom: 20 }}>0% Commission. Best Prices Guaranteed.</Text>
+      <Text style={{ color: '#94a3b8', marginBottom: 15 }}>0% Commission. Best Prices Guaranteed.</Text>
+      
+      <TextInput 
+        value={searchQuery}
+        onChangeText={handleSearch}
+        placeholder="Search by package name or vendor..." 
+        placeholderTextColor="#64748b" 
+        style={{ backgroundColor: '#1e293b', color: 'white', padding: 15, borderRadius: 12, marginBottom: 20, borderWidth: 1, borderColor: '#334155' }} 
+      />
       
       {loading ? (
         <ActivityIndicator size="large" color="#10b981" />
@@ -681,7 +807,7 @@ const ProfileScreen = () => (
   </View>
 );
 
-const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string) => void }) => {
+const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string, context?: string) => void }) => {
   const [cities, setCities] = useState<{name: string, lat: string, lon: string}[]>([
     { name: 'Rajkot', lat: '22.3039', lon: '70.8022' },
     { name: 'Dwarka', lat: '22.2442', lon: '68.9685' },
@@ -1056,7 +1182,7 @@ const CustomRouteScreen = () => {
       </View>
 
       {cities.length > 1 && (
-        <TouchableOpacity onPress={handleGenerate} style={{ backgroundColor: '#4f46e5', padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 30 }}>
+        <TouchableOpacity onPress={() => alert('Calculating...')} style={{ backgroundColor: '#4f46e5', padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 30 }}>
           <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Calculate Fare & Route Map</Text>
         </TouchableOpacity>
       )}
@@ -1104,7 +1230,7 @@ const GenericListScreen = ({ endpoint, title, icon, subtitle }: { endpoint: stri
 };
 
 const LocalRidesScreen = ({ user }: { user?: any }) => {
-  const searchCities = []; // removed initialSearch dependency for simplicity if it was global
+  const searchCities: string[] = []; // removed initialSearch dependency for simplicity if it was global
   const [pickup, setPickup] = useState(searchCities.length > 0 ? searchCities[0] : '');
   const [drop, setDrop] = useState('');
   const [step, setStep] = useState<'location' | 'select_vehicle' | 'searching' | 'accepted'>('location');
@@ -1116,7 +1242,11 @@ const LocalRidesScreen = ({ user }: { user?: any }) => {
 
   useEffect(() => {
     // Connect using the dynamic API URL
-    const newSocket = io(EXPO_PUBLIC_API_URL);
+    const newSocket = io(EXPO_PUBLIC_API_URL, {
+      extraHeaders: {
+        'Bypass-Tunnel-Reminder': 'true'
+      }
+    });
     setSocket(newSocket);
 
     newSocket.on('ride_requested', (data) => {
@@ -1253,7 +1383,7 @@ const LocalRidesScreen = ({ user }: { user?: any }) => {
                 <Text style={{ color: '#94a3b8', fontSize: 12 }}>{acceptedDriver.vehicleModel}</Text>
               </View>
               <View style={{ alignItems: 'flex-end' }}>
-                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16, backgroundColor: '#facc15', paddingHorizontal: 8, borderRadius: 5, color: 'black' }}>{acceptedDriver.vehicleNumber}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 16, backgroundColor: '#facc15', paddingHorizontal: 8, borderRadius: 5, color: 'black' }}>{acceptedDriver.vehicleNumber}</Text>
               </View>
             </View>
 
@@ -1274,47 +1404,76 @@ const LocalRidesScreen = ({ user }: { user?: any }) => {
 
 
 // --- SETTINGS SCREEN ---
-const SettingsScreen = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [locationServices, setLocationServices] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
-  const [dataSaver, setDataSaver] = useState(false);
+const SettingsScreen = ({ notifications, setNotifications, locationServices, setLocationServices, darkMode, setDarkMode, dataSaver, setDataSaver }: any) => {
+
+  const handleLocation = (val: boolean) => {
+    setLocationServices(val);
+    if (val) {
+      Alert.alert("Location Services", "GPS access has been enabled. Your location will be used to find nearby rides.");
+    }
+  };
+
+  const handleNotifications = (val: boolean) => {
+    setNotifications(val);
+    if (val) {
+      Alert.alert("Notifications Enabled", "You will now receive push notifications for ride updates and bookings.");
+    }
+  };
+
+  const handleDarkMode = (val: boolean) => {
+    setDarkMode(val);
+    if (!val) {
+      Alert.alert("Light Mode Activated", "Light mode enabled globally.");
+    }
+  };
+
+  const handleDataSaver = (val: boolean) => {
+    setDataSaver(val);
+    if (val) {
+      Alert.alert("Data Saver On", "Background syncing reduced to save data.");
+    }
+  };
+
+  const bgColor = darkMode ? '#0f172a' : '#f1f5f9';
+  const cardColor = darkMode ? '#1e293b' : '#ffffff';
+  const textColor = darkMode ? 'white' : '#0f172a';
+  const subTextColor = darkMode ? '#94a3b8' : '#64748b';
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#0f172a', padding: 20 }}>
-      <Text style={{ fontSize: 28, fontWeight: 'bold', color: 'white', marginBottom: 20, marginTop: 40 }}>Settings</Text>
+    <View style={{ flex: 1, backgroundColor: bgColor, padding: 20 }}>
+      <Text style={{ fontSize: 28, fontWeight: 'bold', color: textColor, marginBottom: 20, marginTop: 40 }}>Settings</Text>
       
-      <View style={{ backgroundColor: '#1e293b', borderRadius: 15, padding: 15, marginBottom: 20 }}>
+      <View style={{ backgroundColor: cardColor, borderRadius: 15, padding: 15, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <View>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>🔔 Notifications</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Receive alerts for rides & bookings</Text>
+            <Text style={{ color: textColor, fontSize: 16, fontWeight: 'bold' }}>🔔 Notifications</Text>
+            <Text style={{ color: subTextColor, fontSize: 12, marginTop: 2 }}>Receive alerts for rides & bookings</Text>
           </View>
-          <Switch value={notifications} onValueChange={setNotifications} trackColor={{ false: '#334155', true: '#facc15' }} thumbColor={'#ffffff'} />
+          <Switch value={notifications} onValueChange={handleNotifications} trackColor={{ false: '#cbd5e1', true: '#facc15' }} thumbColor={'#ffffff'} />
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <View>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>📍 Location Services</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Allow access to GPS for accurate rides</Text>
+            <Text style={{ color: textColor, fontSize: 16, fontWeight: 'bold' }}>📍 Location Services</Text>
+            <Text style={{ color: subTextColor, fontSize: 12, marginTop: 2 }}>Allow access to GPS for accurate rides</Text>
           </View>
-          <Switch value={locationServices} onValueChange={setLocationServices} trackColor={{ false: '#334155', true: '#34d399' }} thumbColor={'#ffffff'} />
+          <Switch value={locationServices} onValueChange={handleLocation} trackColor={{ false: '#cbd5e1', true: '#34d399' }} thumbColor={'#ffffff'} />
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <View>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>🌙 Dark Mode</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Toggle application theme</Text>
+            <Text style={{ color: textColor, fontSize: 16, fontWeight: 'bold' }}>🌙 Dark Mode</Text>
+            <Text style={{ color: subTextColor, fontSize: 12, marginTop: 2 }}>Toggle application theme</Text>
           </View>
-          <Switch value={darkMode} onValueChange={setDarkMode} trackColor={{ false: '#334155', true: '#4f46e5' }} thumbColor={'#ffffff'} />
+          <Switch value={darkMode} onValueChange={handleDarkMode} trackColor={{ false: '#cbd5e1', true: '#4f46e5' }} thumbColor={'#ffffff'} />
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>📶 Data Saver</Text>
-            <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>Reduce image quality to save data</Text>
+            <Text style={{ color: textColor, fontSize: 16, fontWeight: 'bold' }}>📶 Data Saver</Text>
+            <Text style={{ color: subTextColor, fontSize: 12, marginTop: 2 }}>Reduce image quality to save data</Text>
           </View>
-          <Switch value={dataSaver} onValueChange={setDataSaver} trackColor={{ false: '#334155', true: '#ef4444' }} thumbColor={'#ffffff'} />
+          <Switch value={dataSaver} onValueChange={handleDataSaver} trackColor={{ false: '#cbd5e1', true: '#ef4444' }} thumbColor={'#ffffff'} />
         </View>
       </View>
     </View>
@@ -1688,8 +1847,15 @@ const TravelerDashboardScreen = ({ user, onPlanTrip }: { user: any, onPlanTrip: 
 const AppContent = () => {
   const [currentScreen, setCurrentScreen] = useState<string>('Home');
   const [history, setHistory] = useState<string[]>([]);
+  const [searchContext, setSearchContext] = useState<string>('');
   const [selectedDestId, setSelectedDestId] = useState<string | null>(null);
   const [loggedUser, setLoggedUser] = useState<any>(null);
+  
+  // Settings State (Global)
+  const [notifications, setNotifications] = useState(false);
+  const [locationServices, setLocationServices] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [dataSaver, setDataSaver] = useState(false);
   
   // Real Database state
   const [apiDestinations, setApiDestinations] = useState<Destination[]>([]);
@@ -1896,18 +2062,18 @@ const AppContent = () => {
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={{ gap: 4 }}>
                 {[
-                  { name: 'Home', icon: '🏠', route: 'Home' },
-                  { name: 'Destinations', icon: '📍', route: 'Destinations' },
-                  { name: 'AI Trip Planner', icon: '🤖', route: 'Trip Planner' },
-                  { name: 'Hotels', icon: '🏨', route: 'Hotels' },
-                  { name: 'Outstation Cabs', icon: '🚕', route: 'Cabs' },
-                  { name: 'Local Rides', icon: '🛵', route: 'Local Rides' },
-                  { name: 'Restaurants', icon: '🍽️', route: 'Restaurants' },
-                  { name: 'Tour Packages', icon: '🌴', route: 'Packages' }
+                  { name: 'Home', tKey: 'home', icon: '🏠', route: 'Home' },
+                  { name: 'Destinations', tKey: 'destinations', icon: '📍', route: 'Destinations' },
+                  { name: 'AI Trip Planner', tKey: 'tripPlanner', icon: '🤖', route: 'Trip Planner' },
+                  { name: 'Hotels', tKey: 'hotels', icon: '🏨', route: 'Hotels' },
+                  { name: 'Outstation Cabs', tKey: 'cabs', icon: '🚕', route: 'Cabs' },
+                  { name: 'Local Rides', tKey: 'localRides', icon: '🛵', route: 'Local Rides' },
+                  { name: 'Restaurants', tKey: 'restaurants', icon: '🍽️', route: 'Restaurants' },
+                  { name: 'Tour Packages', tKey: 'packages', icon: '🌴', route: 'Packages' }
                 ].map((item) => (
                   <TouchableOpacity key={item.name} onPress={() => { navigateTo(item.route); setIsMenuOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 15, borderRadius: 12, backgroundColor: currentScreen === item.route ? '#1e293b' : 'transparent', marginBottom: 4 }}>
                     <Text style={{ fontSize: 22, marginRight: 15 }}>{item.icon}</Text>
-                    <Text style={{ color: currentScreen === item.route ? 'white' : '#cbd5e1', fontSize: 16, fontWeight: currentScreen === item.route ? 'bold' : 'normal' }}>{item.name}</Text>
+                    <Text style={{ color: currentScreen === item.route ? 'white' : '#cbd5e1', fontSize: 16, fontWeight: currentScreen === item.route ? 'bold' : 'normal' }}>{t(item.tKey, currentLang)}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -1964,7 +2130,12 @@ const AppContent = () => {
             {currentScreen === 'Packages' && <PackagesScreen />}
             {currentScreen === 'Local Rides' && <LocalRidesScreen user={loggedUser} />}
             {currentScreen === 'PartnerDashboard' && <PartnerDashboardScreen />}
-            {currentScreen === 'Settings' && <SettingsScreen />}
+            {currentScreen === 'Settings' && <SettingsScreen 
+              notifications={notifications} setNotifications={setNotifications}
+              locationServices={locationServices} setLocationServices={setLocationServices}
+              darkMode={darkMode} setDarkMode={setDarkMode}
+              dataSaver={dataSaver} setDataSaver={setDataSaver}
+            />}
             {currentScreen === 'TravelerDashboard' && <TravelerDashboardScreen user={loggedUser} onPlanTrip={() => navigateTo('Trip Planner')} />}
             {currentScreen === 'Login' && <TravelerLoginScreen onLogin={(u) => { setLoggedUser(u); navigateTo('TravelerDashboard'); }} />}
             {currentScreen === 'PartnerLogin' && <PartnerLoginScreen onLogin={() => navigateTo('PartnerDashboard')} />}

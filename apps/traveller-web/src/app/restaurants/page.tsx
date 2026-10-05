@@ -66,20 +66,15 @@ export default function RestaurantsPage() {
     const fetchRestaurants = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('http://localhost:3001/restaurants');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const url = new URL(`${apiUrl}/restaurants`);
+        if (searchQuery) url.searchParams.append('location', searchQuery);
+        
+        const res = await fetch(url.toString());
         const resList = await res.json();
         
         if (resList && resList.length > 0) {
-          
-          if (searchQuery) {
-            const filtered = resList.filter((r: any) => 
-              r.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-              r.location.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setRestaurants(filtered);
-          } else {
-            setRestaurants(resList);
-          }
+          setRestaurants(resList);
         } else {
           setRestaurants(fallbackRestaurants);
         }

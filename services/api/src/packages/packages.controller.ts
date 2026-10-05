@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { PackagesService } from './packages.service.js';
 
 @Controller('packages')
@@ -6,7 +6,7 @@ export class PackagesController {
   constructor(private readonly packagesService: PackagesService) {}
 
   @Get()
-  findAll() {
-    return this.packagesService.findAll();
+  findAll(@Query('location') location?: string) {
+    return this.packagesService.findAll(location);
   }
 }

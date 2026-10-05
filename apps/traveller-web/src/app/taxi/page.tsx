@@ -19,7 +19,12 @@ function TaxiPageContent() {
 
   const fetchTaxis = async () => {
     try {
-      const res = await fetch('http://localhost:3001/taxis');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const url = new URL(`${apiUrl}/taxis`);
+      if (pickup) url.searchParams.append('pickup', pickup);
+      if (dropoff) url.searchParams.append('dropoff', dropoff);
+      
+      const res = await fetch(url.toString());
       const taxiList = await res.json();
       
       if (taxiList && taxiList.length > 0) {

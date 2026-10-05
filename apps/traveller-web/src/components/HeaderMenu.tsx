@@ -66,13 +66,25 @@ export default function HeaderMenu() {
         </button>
         {isLangOpen && (
           <div className="absolute left-0 mt-2 w-32 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden py-1 z-50">
-            {['En', 'ગુજરાતી', 'हिन्दी'].map(lang => (
+            {[
+              { label: 'English', code: 'en', display: 'En' },
+              { label: 'ગુજરાતી', code: 'gu', display: 'ગુજરાતી' },
+              { label: 'हिन्दी', code: 'hi', display: 'हिन्दी' }
+            ].map(lang => (
               <button 
-                key={lang}
-                onClick={() => { setCurrentLang(lang); setIsLangOpen(false); }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-800 transition-colors ${currentLang === lang ? 'text-indigo-400 font-bold' : 'text-white'}`}
+                key={lang.code}
+                onClick={() => { 
+                  setCurrentLang(lang.display); 
+                  setIsLangOpen(false); 
+                  
+                  // Trigger Google Translate via cookie
+                  document.cookie = `googtrans=/en/${lang.code}; path=/`;
+                  document.cookie = `googtrans=/en/${lang.code}; domain=.${window.location.hostname}; path=/`;
+                  window.location.reload();
+                }}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-800 transition-colors ${currentLang === lang.display ? 'text-indigo-400 font-bold' : 'text-white'}`}
               >
-                {lang === 'En' ? 'English' : lang}
+                {lang.label}
               </button>
             ))}
           </div>

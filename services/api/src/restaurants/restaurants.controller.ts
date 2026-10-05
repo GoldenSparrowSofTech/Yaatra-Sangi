@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service.js';
 
 @Controller('restaurants')
@@ -6,7 +6,7 @@ export class RestaurantsController {
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
   @Get()
-  findAll() {
-    return this.restaurantsService.findAll();
+  findAll(@Query('location') location?: string) {
+    return this.restaurantsService.findAll(location);
   }
 }

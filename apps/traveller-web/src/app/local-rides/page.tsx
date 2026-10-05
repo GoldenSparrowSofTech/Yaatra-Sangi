@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import('../../components/MapComponent'), { ssr: false });
 
 export default function LocalRidesPage() {
   const router = useRouter();
@@ -14,6 +17,25 @@ export default function LocalRidesPage() {
   const [acceptedDriver, setAcceptedDriver] = useState<any | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{lat: number, lon: number, name: string} | null>(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          const locationName = data.address?.city || data.address?.town || data.address?.village || "My Location";
+          setUserLocation({ lat: latitude, lon: longitude, name: locationName });
+          setPickup(locationName);
+        } catch (e) {
+          setUserLocation({ lat: latitude, lon: longitude, name: "My Location" });
+          setPickup("My Location");
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
     // Connect to NestJS WebSocket Gateway
@@ -104,11 +126,12 @@ export default function LocalRidesPage() {
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80')",
           filter: step === 'searching' ? 'brightness(0.5)' : 'brightness(0.8)',
           transform: step === 'searching' ? 'scale(1.1)' : 'scale(1)',
         }}
-      ></div>
+      >
+        <MapComponent destinations={userLocation ? [userLocation] : []} />
+      </div>
 
       {/* Map Overlay Grid */}
       <div className="absolute inset-0 z-0 bg-slate-900/20 pointer-events-none"></div>

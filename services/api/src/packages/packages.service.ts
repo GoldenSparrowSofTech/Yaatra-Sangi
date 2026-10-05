@@ -5,8 +5,12 @@ import { PrismaService } from '../prisma/prisma.service.js';
 export class PackagesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    const packages = await this.prisma.package.findMany();
+  async findAll(location?: string) {
+    let whereClause = {};
+    if (location) {
+      whereClause = { destination: { contains: location } };
+    }
+    const packages = await this.prisma.package.findMany({ where: whereClause });
     return packages.map(p => ({
       id: p.id,
       slug: p.slug,

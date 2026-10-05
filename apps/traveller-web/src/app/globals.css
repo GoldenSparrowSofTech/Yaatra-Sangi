@@ -62,3 +62,38 @@ html, body {
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
+
+/* Faked Light Mode */
+.light-theme-forced {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+.light-theme-forced * {
+  border-color: #cbd5e1 !important;
+}
+.light-theme-forced .bg-slate-950, 
+.light-theme-forced .bg-slate-900,
+.light-theme-forced .bg-slate-800,
+.light-theme-forced [class*='bg-slate-9'] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+.light-theme-forced .text-slate-200,
+.light-theme-forced .text-slate-400,
+.light-theme-forced .text-white {
+  color: #334155 !important;
+}
+
+
+.light-theme-forced .glass-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: #0f172a !important;
+}
+.light-theme-forced .bg-mesh {
+  background-color: #f8fafc !important;
+}
+.light-theme-forced [style*='linear-gradient'] {
+  background-blend-mode: screen !important;
+  background-color: #ffffff !important;
+}
+
