@@ -15,7 +15,8 @@ export default function VendorDashboard() {
 
   useEffect(() => {
     if (isRegistered) {
-      const newSocket = io('http://localhost:3004');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const newSocket = io(apiUrl);
       setSocket(newSocket);
 
       newSocket.on('connect', () => {

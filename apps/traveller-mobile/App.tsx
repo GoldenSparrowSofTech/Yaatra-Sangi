@@ -5,7 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { io, Socket } from 'socket.io-client';
 import { WebView } from 'react-native-webview';
 const isWeb = Platform.OS === 'web';
-const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3001' : 'https://yatrasangi-demo.loca.lt');
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL || (isWeb ? 'http://localhost:3001' : 'https://YaatraSangi-demo.loca.lt');
 
 // Global override to bypass Localtunnel splash screen for all API requests
 const originalFetch = (globalThis as any).fetch;
@@ -101,7 +101,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
         {/* Floating Logo Top Left (Below Header) */}
         <View style={{ position: 'absolute', top: 10, left: 20, zIndex: 50 }}>
           <Image 
-            source={require('./assets/yatrasangi_logo.jpeg')} 
+            source={require('./assets/yatrasangi_logo.png')} 
             style={{ width: 80, height: 80, borderRadius: 12, borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' }} 
           />
         </View>
@@ -114,10 +114,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
 
           <Text style={{ fontSize: 48, fontWeight: '900', color: '#ffffff', textAlign: 'center', lineHeight: 55 }}>
             Experience{'\n'}
-            <Text style={{ color: '#c084fc' }}>YatraSangi</Text>
+            <Text style={{ color: '#0284c7' }}>Yaatra</Text><Text style={{ color: '#f97316' }}>Sangi</Text>
           </Text>
 
-          <Text style={{ color: '#cbd5e1', textAlign: 'center', fontSize: 16, marginTop: 20, lineHeight: 24, paddingHorizontal: 10 }}>
+          <Text style={{ color: '#38bdf8', textAlign: 'center', fontSize: 16, marginTop: 8, fontStyle: 'italic', fontWeight: '600' }}>
+            "Your Journey. Your Companion."
+          </Text>
+
+          <Text style={{ color: '#cbd5e1', textAlign: 'center', fontSize: 15, marginTop: 15, lineHeight: 22, paddingHorizontal: 10 }}>
             Zero commissions. Direct bookings. Intelligent AI routing.{'\n'}Your ultimate personalized travel companion.
           </Text>
 
@@ -175,10 +179,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
           })}
         </View>
 
-        {/* Why YatraSangi Section */}
+        {/* Why YaatraSangi Section */}
         <View style={{ marginTop: 40, paddingHorizontal: 20, paddingBottom: 60, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 60, maxWidth: 1200, alignSelf: 'center', width: '100%' }}>
           <View style={{ alignItems: 'center', marginBottom: 40 }}>
-            <Text style={{ fontSize: 40, fontWeight: '900', color: '#ffffff', textAlign: 'center', marginBottom: 10 }}>Why YatraSangi?</Text>
+            <Text style={{ fontSize: 40, fontWeight: '900', color: '#ffffff', textAlign: 'center', marginBottom: 10 }}>Why YaatraSangi?</Text>
             <Text style={{ color: '#94a3b8', textAlign: 'center', fontSize: 18 }}>The most transparent way to travel.</Text>
           </View>
 
@@ -205,7 +209,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
         <View style={{ backgroundColor: '#020617', paddingVertical: 50, paddingHorizontal: 30, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' }}>
           <View style={{ flexDirection: isWeb ? 'row' : 'column', maxWidth: 1200, alignSelf: 'center', width: '100%', justifyContent: 'space-between', gap: 40 }}>
             <View style={{ flex: isWeb ? 1.5 : undefined }}>
-              <Text style={{ color: '#ffffff', fontSize: 20, fontWeight: 'bold', marginBottom: 15 }}>YatraSangi</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <Image source={require('./assets/yatrasangi_logo.png')} style={{ width: 28, height: 28, borderRadius: 6, marginRight: 8 }} />
+                <Text style={{ fontSize: 20, fontWeight: '900' }}>
+                  <Text style={{ color: '#0284c7' }}>Yaatra</Text><Text style={{ color: '#f97316' }}>Sangi</Text>
+                </Text>
+              </View>
+              <Text style={{ color: '#38bdf8', fontSize: 13, fontStyle: 'italic', marginBottom: 8, fontWeight: '600' }}>Your Journey. Your Companion.</Text>
               <Text style={{ color: '#94a3b8', fontSize: 14, lineHeight: 22, paddingRight: 20 }}>Your ultimate companion for planning trips, booking stays, and finding reliable rides across India.</Text>
             </View>
             
@@ -244,7 +254,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ destinations, onNavigateToDetai
           </View>
           
           <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)', marginTop: 40, paddingTop: 20, flexDirection: isWeb ? 'row' : 'column', justifyContent: 'space-between', alignItems: 'center', maxWidth: 1200, alignSelf: 'center', width: '100%' }}>
-            <Text style={{ color: '#64748b', fontSize: 12 }}>© 2026 YatraSangi. All rights reserved.</Text>
+            <Text style={{ color: '#64748b', fontSize: 12 }}>© 2026 YaatraSangi. All rights reserved.</Text>
             
             <View style={{ flexDirection: isWeb ? 'row' : 'column', alignItems: 'center', marginTop: isWeb ? 0 : 25, gap: 10 }}>
               <Text style={{ color: '#94a3b8', fontSize: 14, fontWeight: '500' }}>Developed with ❤️ by</Text>
@@ -824,7 +834,7 @@ const AITripPlannerScreen = ({ onNavigate }: { onNavigate: (screen: string, cont
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${cityName}&format=json&limit=1&countrycodes=in`, {
           headers: {
-            'User-Agent': 'YatraSangiTravelApp/1.0'
+            'User-Agent': 'YaatraSangiTravelApp/1.0'
           }
         });
         const data = await res.json();
@@ -1253,7 +1263,7 @@ const LocalRidesScreen = ({ user }: { user?: any }) => {
       setBookingId(data.id);
       // Simulate driver acceptance
       setTimeout(() => {
-         newSocket.emit('accept_ride', { bookingId: data.id, driverId: "partner@yatrasangi.com" });
+         newSocket.emit('accept_ride', { bookingId: data.id, driverId: "partner@YaatraSangi.com" });
       }, 4000);
     });
 
@@ -1287,7 +1297,7 @@ const LocalRidesScreen = ({ user }: { user?: any }) => {
   const handleBookRide = () => {
     if (socket) {
       setStep('searching');
-      socket.emit('request_ride', { userId: user?.email || "guest@yatrasangi.com", pickup, drop, vehicleType: selectedVehicle });
+      socket.emit('request_ride', { userId: user?.email || "guest@YaatraSangi.com", pickup, drop, vehicleType: selectedVehicle });
     }
   };
 
@@ -1304,7 +1314,7 @@ const LocalRidesScreen = ({ user }: { user?: any }) => {
           <View style={{ backgroundColor: 'rgba(15,23,42,0.9)', padding: 15, borderRadius: 20, marginBottom: 15, flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ fontSize: 24, marginRight: 10 }}>🛺</Text>
             <View>
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>YatraSangi Rides</Text>
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>YaatraSangi Rides</Text>
               <Text style={{ color: '#94a3b8', fontSize: 12 }}>0% Commission. Direct to Driver.</Text>
             </View>
           </View>
@@ -1529,7 +1539,7 @@ const PartnerDashboardScreen = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.title}>Partner <Text style={styles.textEmerald}>Dashboard</Text></Text>
-        <Text style={{ color: '#94a3b8', fontSize: 14, marginTop: 5 }}>Manage your business on YatraSangi</Text>
+        <Text style={{ color: '#94a3b8', fontSize: 14, marginTop: 5 }}>Manage your business on YaatraSangi</Text>
       </View>
 
       <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: '#10b981', borderWidth: 1, borderRadius: 16, padding: 20, marginHorizontal: 20, marginBottom: 25, flexDirection: 'row', alignItems: 'center' }}>
@@ -1709,7 +1719,7 @@ const TravelerLoginScreen = ({ onLogin }: { onLogin: (user: any) => void }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={{ color: '#475569', textAlign: 'center', marginTop: 20, fontSize: 12 }}>Use traveler@yatrasangi.com / password123</Text>
+        <Text style={{ color: '#475569', textAlign: 'center', marginTop: 20, fontSize: 12 }}>Use traveler@YaatraSangi.com / password123</Text>
       </View>
     </ImageBackground>
   );
@@ -1726,7 +1736,7 @@ const PartnerLoginScreen = ({ onLogin }: { onLogin: () => void }) => {
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
-        alert(`Mock SMS: Your YatraSangi OTP is 123456`);
+        alert(`Mock SMS: Your YaatraSangi OTP is 123456`);
         setStep(2);
       }, 1000);
     } else {
@@ -1977,8 +1987,8 @@ const AppContent = () => {
       <View style={{ flex: 1, backgroundColor: '#020617', justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#34d399" />
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
-          <Image source={require('./assets/yatrasangi_logo.jpeg')} style={{ width: 30, height: 30, borderRadius: 8, marginRight: 10 }} />
-          <Text style={{ color: '#34d399', fontSize: 18 }}>Starting YatraSangi...</Text>
+          <Image source={require('./assets/yatrasangi_logo.png')} style={{ width: 30, height: 30, borderRadius: 8, marginRight: 10 }} />
+          <Text style={{ color: '#34d399', fontSize: 18 }}>Starting YaatraSangi...</Text>
         </View>
       </View>
     );
@@ -2000,8 +2010,10 @@ const AppContent = () => {
               </TouchableOpacity>
             )}
             <TouchableOpacity onPress={() => currentScreen !== 'Home' && navigateTo('Home')} style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={require('./assets/yatrasangi_logo.jpeg')} style={{ width: 30, height: 30, borderRadius: 8, marginRight: 10 }} />
-              <Text style={{ color: '#818cf8', fontSize: 22, fontWeight: 'bold' }}>YatraSangi</Text>
+              <Image source={require('./assets/yatrasangi_logo.png')} style={{ width: 34, height: 34, borderRadius: 8, marginRight: 8 }} />
+              <Text style={{ fontSize: 22, fontWeight: '900' }}>
+                <Text style={{ color: '#0284c7' }}>Yaatra</Text><Text style={{ color: '#f97316' }}>Sangi</Text>
+              </Text>
             </TouchableOpacity>
           </View>
           

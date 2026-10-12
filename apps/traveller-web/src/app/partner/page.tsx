@@ -10,7 +10,7 @@ export default function PartnerDashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Partner <span className="text-emerald-400">Dashboard</span></h1>
-          <p className="text-slate-400">Manage your business on YatraSangi</p>
+          <p className="text-slate-400">Manage your business on <span className="font-bold"><span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span></span></p>
         </div>
 
         {/* Trial Banner */}

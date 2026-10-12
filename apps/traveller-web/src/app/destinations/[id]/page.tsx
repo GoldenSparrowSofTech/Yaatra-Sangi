@@ -18,8 +18,8 @@ export async function generateStaticParams() {
 // Fetch data from the NestJS API
 async function getDestinationData(id: string) {
   try {
-    // Calling the NestJS API running on port 3001
-    const res = await fetch(`http://localhost:3004/destinations/${id}`, { cache: 'no-store' });
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const res = await fetch(`${apiUrl}/destinations/${id}`, { cache: 'no-store' });
     if (!res.ok) {
       throw new Error('Failed to fetch data');
     }

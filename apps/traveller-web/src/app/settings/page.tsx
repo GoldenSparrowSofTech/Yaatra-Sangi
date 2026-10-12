@@ -25,7 +25,7 @@ export default function SettingsPage() {
     if (val && typeof window !== 'undefined' && 'Notification' in window) {
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          new Notification('YatraSangi', { body: 'Notifications enabled successfully!' });
+          new Notification('YaatraSangi', { body: 'Notifications enabled successfully!' });
         } else {
           setNotifications(false);
         }
@@ -77,7 +77,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between mb-8 pb-8 border-b border-slate-800/50">
             <div>
               <h2 className="text-xl font-bold text-white flex items-center gap-2">📍 Location Services</h2>
-              <p className="text-slate-400 text-sm mt-1">Allow YatraSangi to access your GPS for accurate ride matching.</p>
+              <p className="text-slate-400 text-sm mt-1">Allow YaatraSangi to access your GPS for accurate ride matching.</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" checked={locationServices} onChange={(e) => handleLocationToggle(e.target.checked)} />

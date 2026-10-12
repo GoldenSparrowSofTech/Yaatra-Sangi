@@ -51,7 +51,7 @@ export default function PartnerOnboarding() {
     <div className="min-h-screen bg-slate-950 text-slate-200 p-6 pt-24 font-sans pb-32">
       <div className="max-w-4xl mx-auto">
         <div className="mb-10 text-center">
-          <Link href="/" className="text-indigo-400 font-bold mb-4 inline-block hover:text-indigo-300">← Back to YatraSangi</Link>
+          <Link href="/" className="text-indigo-400 font-bold mb-4 inline-block hover:text-indigo-300">← Back to YaatraSangi</Link>
           <h1 className="text-4xl font-black text-white bg-gradient-to-r from-emerald-400 to-indigo-400 text-transparent bg-clip-text">Partner Onboarding</h1>
           <p className="text-slate-400 mt-2">Strict AI Verification System. Drive Safe, Earn More.</p>
         </div>

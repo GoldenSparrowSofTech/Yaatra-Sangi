@@ -9,15 +9,132 @@ export default function DestinationsPage() {
 
   const categories = ['All', 'Trending', 'Romantic', 'Adventure', 'Heritage'];
 
+  const fallbackDestinations = [
+    {
+      id: "1",
+      name: "Rajkot",
+      state: "Gujarat",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80",
+      rating: 4.5,
+      type: "Trending",
+      description: "Cultural hub of Saurashtra with amazing food and heritage.",
+      placesToVisit: [
+        { name: "Rotary Dolls Museum", image: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80", description: "Unique museum with dolls from around the world." },
+        { name: "Watson Museum", image: "https://images.unsplash.com/photo-1518998053401-878c735c0754?q=80", description: "Excellent collection of human history and culture." }
+      ]
+    },
+    {
+      id: "2",
+      name: "Dwarka",
+      state: "Gujarat",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1629813358055-6677e81b66b8?q=80",
+      rating: 4.9,
+      type: "Heritage",
+      description: "Ancient sacred city of Lord Krishna.",
+      placesToVisit: [
+        { name: "Dwarkadhish Temple", image: "https://images.unsplash.com/photo-1629813358055-6677e81b66b8?q=80", description: "Main temple dedicated to Lord Krishna." },
+        { name: "Bet Dwarka", image: "https://images.unsplash.com/photo-1580911762111-e630132b49b3?q=80", description: "Island near Dwarka." }
+      ]
+    },
+    {
+      id: "3",
+      name: "Goa",
+      state: "Goa",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80",
+      rating: 4.8,
+      type: "Romantic",
+      description: "Famous for its beautiful beaches, nightlife, and Portuguese heritage.",
+      placesToVisit: [
+        { name: "Baga Beach", image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80", description: "Popular beach in North Goa." }
+      ]
+    },
+    {
+      id: "4",
+      name: "Rajasthan",
+      state: "Rajasthan",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80",
+      rating: 4.9,
+      type: "Heritage",
+      description: "The land of kings, famous for massive forts and royal palaces.",
+      placesToVisit: [
+        { name: "Amber Fort", image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80", description: "Majestic fort in Jaipur." }
+      ]
+    },
+    {
+      id: "5",
+      name: "Kerala",
+      state: "Kerala",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80",
+      rating: 4.9,
+      type: "Romantic",
+      description: "God's Own Country, famous for its backwaters and lush green landscapes.",
+      placesToVisit: [
+        { name: "Alleppey Backwaters", image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80", description: "Beautiful backwaters." }
+      ]
+    },
+    {
+      id: "6",
+      name: "Agra",
+      state: "Uttar Pradesh",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1564507592227-cb84b196a8ee?q=80",
+      rating: 4.7,
+      type: "Heritage",
+      description: "Home to the iconic Taj Mahal, a symbol of eternal love.",
+      placesToVisit: [
+        { name: "Taj Mahal", image: "https://images.unsplash.com/photo-1564507592227-cb84b196a8ee?q=80", description: "Wonder of the World." }
+      ]
+    },
+    {
+      id: "7",
+      name: "Manali",
+      state: "Himachal Pradesh",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80",
+      rating: 4.8,
+      type: "Adventure",
+      description: "A high-altitude Himalayan resort town known for snow and trails.",
+      placesToVisit: [
+        { name: "Solang Valley", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80", description: "Adventure sports." }
+      ]
+    },
+    {
+      id: "8",
+      name: "Andaman",
+      state: "Andaman",
+      country: "India",
+      image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80",
+      rating: 4.9,
+      type: "Trending",
+      description: "Pristine beaches, crystal clear waters, and world-class scuba diving.",
+      placesToVisit: [
+        { name: "Radhanagar Beach", image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80", description: "Asia's best beach." }
+      ]
+    }
+  ];
+
   useEffect(() => {
-    fetch('http://localhost:3004/destinations')
-      .then(res => res.json())
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    fetch(`${apiUrl}/destinations`)
+      .then(res => {
+        if (!res.ok) throw new Error('Network error');
+        return res.json();
+      })
       .then(data => {
         if (data && data.length > 0) {
           setDestinations(data);
+        } else {
+          setDestinations(fallbackDestinations);
         }
       })
-      .catch(err => console.error("Failed to load destinations", err))
+      .catch(() => {
+        setDestinations(fallbackDestinations);
+      })
       .finally(() => setLoading(false));
   }, []);
 

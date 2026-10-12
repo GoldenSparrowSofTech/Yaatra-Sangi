@@ -10,8 +10,8 @@ import HeaderMenu from '../components/HeaderMenu'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'YatraSangi | Build Your Own Trip',
-  description: 'Optimize your route, plan your stay, and book everything in one place.',
+  title: 'YaatraSangi | Your Journey. Your Companion.',
+  description: 'Optimize your route, plan your stay, and book everything in one place with YaatraSangi.',
 }
 
 export const viewport = {
@@ -44,8 +44,10 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div className="flex items-center gap-3 shrink-0">
               <HeaderMenu />
-              <img src="/yatrasangi_logo.jpeg" alt="YatraSangi Logo" className="w-8 h-8 rounded-md object-cover" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 text-transparent bg-clip-text hidden sm:block">YatraSangi</span>
+              <img src="/yatrasangi_logo.png" alt="YaatraSangi Logo" className="w-9 h-9 rounded-xl object-contain bg-white/10 p-0.5 border border-white/20 shadow-md" />
+              <span className="text-2xl font-black tracking-tight hidden sm:inline-block">
+                <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>
+              </span>
             </div>
             <nav className="hidden 2xl:flex gap-3 text-[13px] font-medium text-slate-300 justify-center flex-1 px-2">
               <a href="/" className="hover:text-white transition-colors whitespace-nowrap">Home</a>
@@ -74,8 +76,14 @@ export default function RootLayout({
         <footer className="bg-slate-950/90 backdrop-blur-md border-t border-slate-800 text-slate-300 py-12 relative z-50">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h2 className="text-xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-indigo-400 text-transparent bg-clip-text">YatraSangi</h2>
-              <p className="text-sm text-slate-400 mb-4">Your ultimate companion for planning trips, booking stays, and finding reliable rides across India.</p>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/yatrasangi_logo.png" alt="YaatraSangi" className="w-8 h-8 rounded-lg object-contain bg-white/10 p-0.5" />
+                <h2 className="text-xl font-black tracking-tight">
+                  <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>
+                </h2>
+              </div>
+              <p className="text-sm text-slate-400 mb-2">Your ultimate companion for planning trips, booking stays, and finding reliable rides across India.</p>
+              <p className="text-xs font-semibold italic text-sky-400">Your Journey. Your Companion.</p>
             </div>
             
             <div>
@@ -130,7 +138,7 @@ export default function RootLayout({
           </div>
           
           <div className="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
-            <p>&copy; {new Date().getFullYear()} YatraSangi. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} YaatraSangi. All rights reserved.</p>
             <div className="mt-6 md:mt-0 flex flex-col sm:flex-row items-center gap-3">
               <span className="text-sm font-medium text-slate-400">Developed with ❤️ by</span>
               <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-gradient-to-r from-yellow-900/40 to-slate-900/80 px-5 py-2.5 rounded-full border border-yellow-500/50 shadow-[0_0_25px_rgba(234,179,8,0.3)] hover:shadow-[0_0_35px_rgba(234,179,8,0.5)] hover:scale-105 transition-all cursor-pointer">

@@ -17,12 +17,20 @@ export default function Home() {
       <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-500 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-blob animation-delay-4000"></div>
 
       {/* Floating Logo Top Left (Below Header) */}
-      <div className="absolute top-20 left-6 md:left-12 z-50 hidden sm:block">
-        <img 
-          src="/yatrasangi_logo.jpeg" 
-          alt="YatraSangi Logo" 
-          className="w-20 h-20 md:w-28 md:h-28 object-cover rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] border-2 border-white/10" 
-        />
+      <div className="absolute top-24 left-6 md:left-12 z-50 hidden sm:block">
+        <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-2xl">
+          <img 
+            src="/yatrasangi_logo.png" 
+            alt="YaatraSangi Logo" 
+            className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-xl" 
+          />
+          <div className="text-left hidden lg:block pr-2">
+            <div className="text-xl font-black leading-tight">
+              <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>
+            </div>
+            <div className="text-[11px] font-semibold text-slate-400 italic">Your Journey. Your Companion.</div>
+          </div>
+        </div>
       </div>
 
       {/* Hero Section */}
@@ -31,17 +39,20 @@ export default function Home() {
         {/* Floating Badge */}
         <div className="inline-flex items-center px-4 py-2 mb-8 text-sm font-bold rounded-full text-indigo-300 glass-panel border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.2)] animate-pulse-slow">
           <span className="flex w-2.5 h-2.5 rounded-full bg-indigo-400 mr-2 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
-          Revolutionizing Travel in 2026
+          Your Journey. Your Companion.
         </div>
         
         {/* Main Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-tight w-full px-2">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-4 leading-tight w-full px-2">
           <span className="text-white">Experience </span>
           <br className="md:hidden" />
-          <span className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-emerald-400 text-transparent bg-clip-text animate-tilt inline-block drop-shadow-2xl">
-            YatraSangi
+          <span className="inline-block drop-shadow-2xl font-black">
+            <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>
           </span>
         </h1>
+        <p className="text-lg md:text-2xl font-semibold text-sky-300 mb-6 tracking-wide italic">
+          "Your Journey. Your Companion."
+        </p>
         
         {/* Sub-headline */}
         <p className="max-w-2xl text-lg sm:text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed font-light drop-shadow-md px-2">
@@ -98,8 +109,8 @@ export default function Home() {
       {/* Features Section */}
       <section className="relative z-10 w-full max-w-7xl mx-auto px-6 py-32 border-t border-slate-800/50">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Why YatraSangi?</h2>
-          <p className="text-xl text-slate-400">The most transparent way to travel.</p>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Why <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>?</h2>
+          <p className="text-xl text-slate-400">The most transparent way to travel. Your Journey. Your Companion.</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -121,8 +132,11 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="relative z-10 w-full py-12 border-t border-slate-800/50 text-center glass-panel mt-20 rounded-t-3xl">
-        <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 text-transparent bg-clip-text mb-4">YatraSangi</div>
-        <p className="text-slate-500 text-sm">&copy; 2026 YatraSangi. Built with ❤️ for travelers.</p>
+        <div className="text-2xl font-black tracking-tight mb-2">
+          <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>
+        </div>
+        <p className="text-slate-400 text-sm mb-1 font-medium italic">Your Journey. Your Companion.</p>
+        <p className="text-slate-500 text-xs">&copy; 2026 YaatraSangi. Built with ❤️ for travelers.</p>
       </footer>
     </main>
   );

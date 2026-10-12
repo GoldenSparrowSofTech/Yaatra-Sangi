@@ -69,7 +69,7 @@ export default function Signup() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Partner Signup</h1>
-          <p className="text-slate-400">Join YatraSangi as a Business Partner</p>
+          <p className="text-slate-400">Join <span className="font-bold"><span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span></span> as a Business Partner</p>
         </div>
 
         {error && (

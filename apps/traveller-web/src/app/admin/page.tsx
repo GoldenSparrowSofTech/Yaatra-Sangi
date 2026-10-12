@@ -43,7 +43,7 @@ export default function AdminDashboardPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
-            <p className="text-slate-400">Manage YatraSangi data and bookings</p>
+            <p className="text-slate-400">Manage <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span> data and bookings</p>
           </div>
           <button 
             onClick={handleLogout}
