@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
+import Link from 'next/link'
 import LanguageTranslator from '../components/LanguageTranslator'
 import AuthStatus from '../components/AuthStatus'
 import HeaderMenu from '../components/HeaderMenu'
@@ -50,13 +51,13 @@ export default function RootLayout({
               </span>
             </div>
             <nav className="hidden 2xl:flex gap-3 text-[13px] font-medium text-slate-300 justify-center flex-1 px-2">
-              <a href="/" className="hover:text-white transition-colors whitespace-nowrap">Home</a>
-              <a href="/destinations" className="hover:text-white transition-colors whitespace-nowrap">Destinations</a>
-              <a href="/plan" className="hover:text-white transition-colors whitespace-nowrap">Trip Planner</a>
-              <a href="/hotels" className="hover:text-white transition-colors whitespace-nowrap">Hotels</a>
-              <a href="/taxi" className="hover:text-white transition-colors flex items-center gap-1 whitespace-nowrap"><span className="text-white">🚕</span> Cabs</a>
-              <a href="/restaurants" className="hover:text-white transition-colors whitespace-nowrap">Restaurants</a>
-              <a href="/tour-packages" className="hover:text-white transition-colors flex items-center gap-1 whitespace-nowrap"><span className="text-emerald-400">🌴</span> Packages</a>
+              <Link href="/" className="hover:text-white transition-colors whitespace-nowrap">Home</Link>
+              <Link href="/destinations" className="hover:text-white transition-colors whitespace-nowrap">Destinations</Link>
+              <Link href="/plan" className="hover:text-white transition-colors whitespace-nowrap">Trip Planner</Link>
+              <Link href="/hotels" className="hover:text-white transition-colors whitespace-nowrap">Hotels</Link>
+              <Link href="/taxi" className="hover:text-white transition-colors flex items-center gap-1 whitespace-nowrap"><span className="text-white">🚕</span> Cabs</Link>
+              <Link href="/restaurants" className="hover:text-white transition-colors whitespace-nowrap">Restaurants</Link>
+              <Link href="/tour-packages" className="hover:text-white transition-colors flex items-center gap-1 whitespace-nowrap"><span className="text-emerald-400">🌴</span> Packages</Link>
             </nav>
             <div className="flex items-center shrink-0">
               <AuthStatus />
@@ -89,14 +90,14 @@ export default function RootLayout({
             <div>
               <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/destinations" className="hover:text-white transition-colors">Top Destinations</a></li>
-                <li><a href="/plan" className="hover:text-white transition-colors">Trip Planner AI</a></li>
-                <li><a href="/hotels" className="hover:text-white transition-colors">Luxury Hotels</a></li>
-                <li><a href="/taxi" className="hover:text-white transition-colors">Book a Cab</a></li>
+                <li><Link href="/destinations" className="hover:text-white transition-colors">Top Destinations</Link></li>
+                <li><Link href="/plan" className="hover:text-white transition-colors">Trip Planner AI</Link></li>
+                <li><Link href="/hotels" className="hover:text-white transition-colors">Luxury Hotels</Link></li>
+                <li><Link href="/taxi" className="hover:text-white transition-colors">Book a Cab</Link></li>
                 <li className="pt-2 mt-2 border-t border-slate-800">
-                  <a href="/vendor" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors flex items-center gap-1">
+                  <Link href="/vendor" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors flex items-center gap-1">
                     <span>💼</span> Partner Login
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -105,7 +106,7 @@ export default function RootLayout({
               <h3 className="text-lg font-semibold text-white mb-4">Customer Reviews</h3>
               <div className="text-sm text-slate-400 space-y-3">
                 <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800">
-                  <p className="italic">"Best travel planning app! Saved me hours of research."</p>
+                  <p className="italic">&quot;Best travel planning app! Saved me hours of research.&quot;</p>
                   <span className="text-yellow-500 font-bold mt-1 block">★★★★★ - Rahul M.</span>
                 </div>
                 <a href="#" className="text-indigo-400 hover:text-indigo-300 text-xs">Read more reviews &rarr;</a>

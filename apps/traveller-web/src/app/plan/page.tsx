@@ -148,7 +148,7 @@ export default function PlanTripPage() {
 
     // AI Route Optimization (Nearest Neighbor + 2-Opt Algorithm)
     setTimeout(async () => {
-      let unvisited = [...destinations.slice(1)];
+      const unvisited = [...destinations.slice(1)];
       let optimized = [destinations[0]];
       let current = destinations[0];
 

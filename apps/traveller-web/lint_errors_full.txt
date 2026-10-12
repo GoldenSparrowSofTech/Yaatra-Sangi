@@ -1,0 +1,190 @@
+﻿D:\Website\travelPartner\apps\traveller-web\src\app\admin\page.tsx -> Line 9: 'user' is assigned a value but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\admin\page.tsx -> Line 9: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\admin\page.tsx -> Line 23: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\app\admin\page.tsx -> Line 33: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\app\admin\seed\page.tsx -> Line 4: 'collection' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\admin\seed\page.tsx -> Line 53: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\dashboard\page.tsx -> Line 6: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\dashboard\page.tsx -> Line 11: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\app\dashboard\page.tsx:11:7
+   9 |     const data = localStorage.getItem('userData');
+  10 |     if (data) {
+> 11 |       setUserData(JSON.parse(data));
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  12 |     } else {
+  13 |       window.location.href = '/login';
+  14 |     } [Rule: react-hooks/set-state-in-effect]
+D:\Website\travelPartner\apps\traveller-web\src\app\dashboard\page.tsx -> Line 13: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\[id]\page.tsx -> Line 31: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\[id]\page.tsx -> Line 93: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\[id]\page.tsx -> Line 113: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\[id]\page.tsx -> Line 137: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\page.tsx -> Line 7: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\page.tsx -> Line 8: 'loading' is assigned a value but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\page.tsx -> Line 139: React Hook useEffect has a missing dependency: 'fallbackDestinations'. Either include it or remove the dependency array. [Rule: react-hooks/exhaustive-deps]
+D:\Website\travelPartner\apps\traveller-web\src\app\destinations\page.tsx -> Line 166: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`. [Rule: react/no-unescaped-entities]
+D:\Website\travelPartner\apps\traveller-web\src\app\hotel\[slug]\page.tsx -> Line 2: 'Link' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\hotels\page.tsx -> Line 3: 'Link' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\hotels\page.tsx -> Line 10: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\hotels\page.tsx -> Line 11: 'isLoading' is assigned a value but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\hotels\page.tsx -> Line 97: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\hotels\page.tsx -> Line 122: React Hook useEffect has a missing dependency: 'fallbackHotels'. Either include it or remove the dependency array. [Rule: react-hooks/exhaustive-deps]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 47: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element [Rule: @next/next/no-img-element]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 53: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages [Rule: @next/next/no-html-link-for-pages]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 54: Do not use an `<a>` element to navigate to `/destinations/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages [Rule: @next/next/no-html-link-for-pages]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 57: Do not use an `<a>` element to navigate to `/taxi/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages [Rule: @next/next/no-html-link-for-pages]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 59: Do not use an `<a>` element to navigate to `/tour-packages/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages [Rule: @next/next/no-html-link-for-pages]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 80: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element [Rule: @next/next/no-img-element]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 92: Do not use an `<a>` element to navigate to `/destinations/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages [Rule: @next/next/no-html-link-for-pages]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 95: Do not use an `<a>` element to navigate to `/taxi/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages [Rule: @next/next/no-html-link-for-pages]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 108: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. [Rule: react/no-unescaped-entities]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 108: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. [Rule: react/no-unescaped-entities]
+D:\Website\travelPartner\apps\traveller-web\src\app\layout.tsx -> Line 145: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element [Rule: @next/next/no-img-element]
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx -> Line 3: 'Link' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx -> Line 17: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx -> Line 32: 'e' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx -> Line 43: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx:43:5
+  41 |     // Connect to NestJS WebSocket Gateway
+  42 |     const newSocket = io('http://localhost:3001');
+> 43 |     setSocket(newSocket);
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  44 |
+  45 |     newSocket.on('connect', () => {
+  46 |       console.log('Connected to WebSocket server'); [Rule: react-hooks/set-state-in-effect]
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx -> Line 68: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\local-rides\page.tsx -> Line 110: 'e' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\login\page.tsx -> Line 4: 'Link' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\login\page.tsx -> Line 15: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\app\login\page.tsx -> Line 34: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\app\login\page.tsx -> Line 38: 'err' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\page.tsx -> Line 22: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element [Rule: @next/next/no-img-element]
+D:\Website\travelPartner\apps\traveller-web\src\app\page.tsx -> Line 54: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. [Rule: react/no-unescaped-entities]
+D:\Website\travelPartner\apps\traveller-web\src\app\page.tsx -> Line 54: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. [Rule: react/no-unescaped-entities]
+D:\Website\travelPartner\apps\traveller-web\src\app\partner\page.tsx -> Line 3: 'Link' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 40: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 56: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 65: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 65: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 65: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 65: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 126: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 151: 'unvisited' is never reassigned. Use 'const' instead. [Rule: prefer-const]
+D:\Website\travelPartner\apps\traveller-web\src\app\plan\page.tsx -> Line 246: 'err' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\restaurants\page.tsx -> Line 7: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\restaurants\page.tsx -> Line 8: 'isLoading' is assigned a value but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\restaurants\page.tsx -> Line 94: React Hook useEffect has a missing dependency: 'fallbackRestaurants'. Either include it or remove the dependency array. [Rule: react-hooks/exhaustive-deps]
+D:\Website\travelPartner\apps\traveller-web\src\app\settings\page.tsx -> Line 16: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\app\settings\page.tsx:16:9
+  14 |       const storedTheme = localStorage.getItem('theme');
+  15 |       if (storedTheme === 'light') {
+> 16 |         setDarkMode(false);
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |         document.documentElement.classList.add('light-theme-forced');
+  18 |       }
+  19 |       setNotifications(Notification.permission === 'granted'); [Rule: react-hooks/set-state-in-effect]
+D:\Website\travelPartner\apps\traveller-web\src\app\settings\page.tsx -> Line 41: 'err' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\signup\page.tsx -> Line 45: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\app\signup\page.tsx -> Line 48: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\taxi\page.tsx -> Line 3: 'Link' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\app\taxi\page.tsx -> Line 13: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\taxi\page.tsx -> Line 33: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\taxi\page.tsx -> Line 52: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\app\taxi\page.tsx:52:5
+  50 |   useEffect(() => {
+  51 |     // Initial fetch
+> 52 |     fetchTaxis();
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  53 |   }, []);
+  54 |
+  55 |   const handleSearch = () => { [Rule: react-hooks/set-state-in-effect]
+D:\Website\travelPartner\apps\traveller-web\src\app\taxi\page.tsx -> Line 53: React Hook useEffect has a missing dependency: 'fetchTaxis'. Either include it or remove the dependency array. [Rule: react-hooks/exhaustive-deps]
+D:\Website\travelPartner\apps\traveller-web\src\app\tour-packages\page.tsx -> Line 5: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\vendor\page.tsx -> Line 13: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\app\vendor\page.tsx -> Line 20: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\app\vendor\page.tsx:20:7
+  18 |       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  19 |       const newSocket = io(apiUrl);
+> 20 |       setSocket(newSocket);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |
+  22 |       newSocket.on('connect', () => {
+  23 |         console.log('Vendor connected to WebSocket'); [Rule: react-hooks/set-state-in-effect]
+D:\Website\travelPartner\apps\traveller-web\src\app\vendor\page.tsx -> Line 43: 'confirmedBooking' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\components\AuthStatus.tsx -> Line 9: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\components\AuthStatus.tsx -> Line 17: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\components\AuthStatus.tsx:17:7
+  15 |     
+  16 |     if (isMockUser) {
+> 17 |       setUser(mockData ? JSON.parse(mockData) : { displayName: 'Traveler' });
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  18 |       setLoading(false);
+  19 |     } else {
+  20 |       const unsubscribe = onAuthStateChanged(auth, (currentUser) => { [Rule: react-hooks/set-state-in-effect]
+D:\Website\travelPartner\apps\traveller-web\src\components\AuthStatus.tsx -> Line 32: Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination [Rule: @next/next/no-location-assign-relative-destination]
+D:\Website\travelPartner\apps\traveller-web\src\components\HeaderMenu.tsx -> Line 5: 'onAuthStateChanged' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\components\HeaderMenu.tsx -> Line 5: 'signOut' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\components\HeaderMenu.tsx -> Line 6: 'auth' is defined but never used. [Rule: @typescript-eslint/no-unused-vars]
+D:\Website\travelPartner\apps\traveller-web\src\components\LanguageTranslator.tsx -> Line 16: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\components\LanguageTranslator.tsx -> Line 17: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free. [Rule: @typescript-eslint/ban-ts-comment]
+D:\Website\travelPartner\apps\traveller-web\src\components\LanguageTranslator.tsx -> Line 18: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\components\LanguageTranslator.tsx -> Line 22: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\components\MapComponent.tsx -> Line 8: Unexpected any. Specify a different type. [Rule: @typescript-eslint/no-explicit-any]
+D:\Website\travelPartner\apps\traveller-web\src\components\MapComponent.tsx -> Line 33: Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Website\travelPartner\apps\traveller-web\src\components\MapComponent.tsx:33:5
+  31 |
+  32 |   useEffect(() => {
+> 33 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |   }, []);
+  35 |
+  36 |   if (!mounted) return <div style={{ height: '100%', width: '100%', backgroundColor: '#0f172a' }}></div>; [Rule: react-hooks/set-state-in-effect]

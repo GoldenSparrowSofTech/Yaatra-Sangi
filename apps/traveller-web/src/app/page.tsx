@@ -51,7 +51,7 @@ export default function Home() {
           </span>
         </h1>
         <p className="text-lg md:text-2xl font-semibold text-sky-300 mb-6 tracking-wide italic">
-          "Your Journey. Your Companion."
+          &quot;Your Journey. Your Companion.&quot;
         </p>
         
         {/* Sub-headline */}

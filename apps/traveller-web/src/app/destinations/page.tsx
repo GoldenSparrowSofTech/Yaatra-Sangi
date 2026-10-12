@@ -163,7 +163,7 @@ export default function DestinationsPage() {
             Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Destinations</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl font-light">
-            Discover India's most beautiful cities, hand-picked for your perfect next vacation.
+            Discover India&apos;s most beautiful cities, hand-picked for your perfect next vacation.
           </p>
         </div>
 
