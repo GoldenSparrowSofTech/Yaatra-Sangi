@@ -4,10 +4,10 @@
   "main": "index.ts",
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",
-    "expo": "~57.0.26",
+    "expo": "~57.0.30",
     "expo-linear-gradient": "~57.0.2",
     "expo-status-bar": "~57.0.1",
-    "expo-updates": "~57.0.24",
+    "expo-updates": "~57.0.26",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
