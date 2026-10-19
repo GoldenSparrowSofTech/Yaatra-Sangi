@@ -19,29 +19,100 @@ export async function generateStaticParams() {
 async function getDestinationData(id: string) {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const res = await fetch(`${apiUrl}/destinations/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${apiUrl}/destinations/${id}`, { next: { revalidate: 3600 } });
     if (!res.ok) {
       throw new Error('Failed to fetch data');
     }
     return res.json();
   } catch (error) {
-    console.error("API Error:", error);
-    
-    // Offline Fallback data mapped by ID
+    // Offline Fallback data mapped by ID/slug for standalone web/mobile
     const fallbacks: Record<string, any> = {
-      '1': { name: 'Rajkot', description: 'Cultural hub of Saurashtra with amazing food and heritage.', placesToVisit: [{name: 'Rotary Dolls Museum', image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80', description: 'Unique museum'}] },
-      '2': { name: 'Dwarka', description: 'Ancient sacred city of Lord Krishna.', placesToVisit: [{name: 'Dwarkadhish Temple', image: 'https://images.unsplash.com/photo-1629813358055-6677e81b66b8?q=80', description: 'Main temple'}] },
-      '3': { name: 'Goa', description: 'Famous for its beautiful beaches, nightlife, and Portuguese heritage.' },
-      '4': { name: 'Rajasthan', description: 'The land of kings, famous for massive forts and royal palaces.' },
-      '5': { name: 'Kerala', description: 'Gods Own Country, famous for its backwaters.' },
-      '6': { name: 'Agra', description: 'Home to the iconic Taj Mahal.' },
-      '7': { name: 'Manali', description: 'A high-altitude Himalayan resort town.' },
-      '8': { name: 'Andaman', description: 'Pristine beaches, crystal clear waters.' },
-      'goa': { name: 'Goa', description: 'Famous for its beautiful beaches, nightlife, and Portuguese heritage.' }
+      'goa': {
+        name: 'Goa',
+        description: 'Famous for its pristine beaches, vibrant nightlife, water sports, and Portuguese architecture.',
+        placesToVisit: [
+          { name: 'Baga Beach', description: 'Famous for water sports and vibrant nightlife.', image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80' },
+          { name: 'Dudhsagar Falls', description: 'Majestic four-tiered waterfall.', image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80' }
+        ],
+        hotels: [{ name: 'Taj Exotica Resort', price: '₹18,000/night', rating: 4.8 }],
+        tours: [{ name: 'South Goa Sightseeing', price: '₹1,200', duration: 'Full Day' }]
+      },
+      'udaipur': {
+        name: 'Udaipur',
+        description: 'The City of Lakes, known for its royal palaces, heritage forts, and tranquil boat cruises.',
+        placesToVisit: [
+          { name: 'City Palace', description: 'Monumental complex overlooking Lake Pichola.', image: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?q=80' }
+        ],
+        hotels: [{ name: 'Taj Lake Palace', price: '₹45,000/night', rating: 4.9 }],
+        tours: [{ name: 'City Palace Tour', price: '₹2,500', duration: 'Half Day' }]
+      },
+      'manali': {
+        name: 'Manali',
+        description: 'A high-altitude Himalayan valley town famous for snow peaks, Solang adventure, and Beas river.',
+        placesToVisit: [
+          { name: 'Solang Valley', description: 'Hub for paragliding and snow adventure.', image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?q=80' }
+        ],
+        hotels: [{ name: 'The Himalayan Resort', price: '₹12,000/night', rating: 4.7 }],
+        tours: [{ name: 'Solang Valley Tour', price: '₹1,800', duration: 'Full Day' }]
+      },
+      'kerala': {
+        name: 'Kerala',
+        description: "God's Own Country, famed for tranquil backwaters, palm-fringed houseboats, and lush tea gardens.",
+        placesToVisit: [
+          { name: 'Alleppey Backwaters', description: 'Serene backwater houseboats.', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80' }
+        ],
+        hotels: [{ name: 'Kumarakom Lake Resort', price: '₹22,000/night', rating: 4.9 }],
+        tours: [{ name: 'Houseboat Day Cruise', price: '₹6,000', duration: 'Full Day' }]
+      },
+      'jaipur': {
+        name: 'Jaipur',
+        description: 'The Pink City of India, world-renowned for Amer Fort, Hawa Mahal, and royal heritage.',
+        placesToVisit: [
+          { name: 'Hawa Mahal', description: 'Palace of Winds with honeycomb facade.', image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80' }
+        ],
+        hotels: [{ name: 'Rambagh Palace', price: '₹48,000/night', rating: 4.9 }],
+        tours: [{ name: 'Royal Forts Tour', price: '₹2,200', duration: 'Full Day' }]
+      },
+      'leh': {
+        name: 'Leh Ladakh',
+        description: 'Land of high passes, ancient Buddhist monasteries, and crystal blue Pangong Lake.',
+        placesToVisit: [
+          { name: 'Pangong Tso', description: 'High altitude vibrant blue lake.', image: 'https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?q=80' }
+        ],
+        hotels: [{ name: 'The Grand Dragon', price: '₹16,000/night', rating: 4.7 }],
+        tours: [{ name: 'Pangong Lake Expedition', price: '₹14,000', duration: '3 Days' }]
+      },
+      'agra': {
+        name: 'Agra',
+        description: 'Home of the timeless Taj Mahal and Mughal grandeur on the banks of Yamuna.',
+        placesToVisit: [
+          { name: 'Taj Mahal', description: 'World Wonder ivory-white marble monument.', image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80' }
+        ],
+        hotels: [{ name: 'The Oberoi Amarvilas', price: '₹42,000/night', rating: 4.9 }],
+        tours: [{ name: 'Sunrise Taj Tour', price: '₹1,500', duration: 'Half Day' }]
+      },
+      'varanasi': {
+        name: 'Varanasi',
+        description: 'The spiritual capital of India, sacred Ganga ghats, and divine evening aarti rituals.',
+        placesToVisit: [
+          { name: 'Dashashwamedh Ghat', description: 'Iconic ghat of Ganga Aarti.', image: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?q=80' }
+        ],
+        hotels: [{ name: 'BrijRama Palace', price: '₹26,000/night', rating: 4.8 }],
+        tours: [{ name: 'Ganga Boat Ride', price: '₹1,200', duration: '3 Hours' }]
+      },
+      'shimla': {
+        name: 'Shimla',
+        description: 'Queen of Hill Stations, featuring Victorian architecture, Mall Road, and pine forests.',
+        placesToVisit: [
+          { name: 'The Ridge & Mall Road', description: 'Scenic pedestrian promenade.', image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80' }
+        ],
+        hotels: [{ name: 'Wildflower Hall', price: '₹32,000/night', rating: 4.9 }],
+        tours: [{ name: 'Kufri Day Tour', price: '₹2,800', duration: 'Full Day' }]
+      }
     };
     
-    if (fallbacks[id]) {
-      return { ...fallbacks[id], placesToVisit: fallbacks[id].placesToVisit || [], hotels: [], tours: [] };
+    if (fallbacks[id.toLowerCase()]) {
+      return fallbacks[id.toLowerCase()];
     }
 
     // Fallback data if API is down

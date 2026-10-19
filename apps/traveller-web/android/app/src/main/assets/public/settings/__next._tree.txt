@@ -1,5 +1,5 @@
-:HL["/_next/static/chunks/18fm7_h-6h8ia.css","style"]
+:HL["/_next/static/chunks/1ezwtpnhsg4fw.css","style"]
 :HL["/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/yatrasangi_logo.png","image"]
 :HL["/logo.jpg","image"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"settings","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"5hs7ZmoD36cyNXHtxiaqx"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"settings","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"ai1fLJHsF-7CW8F8X0xKd"}
