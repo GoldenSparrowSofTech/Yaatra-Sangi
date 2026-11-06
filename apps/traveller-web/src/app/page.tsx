@@ -16,8 +16,8 @@ export default function Home() {
       <div className="absolute top-0 -right-4 w-96 h-96 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob animation-delay-2000"></div>
       <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-500 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-blob animation-delay-4000"></div>
 
-      {/* Floating Logo Top Left (Below Header) */}
-      <div className="absolute top-24 left-6 md:left-12 z-50 hidden sm:block">
+      {/* Top Hero */}`
+      <div className="absolute top-24 left-6 md:left-12 z-40 hidden 2xl:block opacity-75 hover:opacity-100 transition-opacity">
         <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-2xl">
           <img 
             src="/yatrasangi_logo.png" 
@@ -34,7 +34,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-4 text-center min-h-[90vh] animate-fade-in-up">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 text-center min-h-[88vh] pt-28 pb-20 animate-fade-in-up">
         
         {/* Floating Badge */}
         <div className="inline-flex items-center px-4 py-2 mb-8 text-sm font-bold rounded-full text-indigo-300 glass-panel border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.2)] animate-pulse-slow">

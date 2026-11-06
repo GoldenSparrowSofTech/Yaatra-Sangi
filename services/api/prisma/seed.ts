@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -18,12 +20,12 @@ async function main() {
         { name: 'Fort Aguada', description: '17th-century Portuguese lighthouse and fortress.' }
       ],
       hotels: [
-        { name: 'Taj Exotica Resort & Spa', price: '₹18,000/night', rating: 4.8 },
-        { name: 'W Goa', price: '₹15,500/night', rating: 4.6 }
+        { name: 'Taj Exotica Resort & Spa', price: 18000, rating: 4.8, latOffset: 0.012, lngOffset: -0.015 },
+        { name: 'W Goa', price: 15500, rating: 4.6, latOffset: -0.008, lngOffset: 0.011 }
       ],
       tours: [
-        { name: 'South Goa Sightseeing Tour', price: '₹1,200', duration: 'Full Day' },
-        { name: 'Mandovi Sunset River Cruise', price: '₹850', duration: '2 Hours' }
+        { name: 'South Goa Sightseeing Tour', price: 1200, duration: 'Full Day' },
+        { name: 'Mandovi Sunset River Cruise', price: 850, duration: '2 Hours' }
       ]
     },
     {
@@ -38,11 +40,11 @@ async function main() {
         { name: 'Jag Mandir', description: 'Island palace palace on Lake Pichola.' }
       ],
       hotels: [
-        { name: 'Taj Lake Palace', price: '₹45,000/night', rating: 4.9 },
-        { name: 'The Leela Palace Udaipur', price: '₹38,000/night', rating: 4.8 }
+        { name: 'Taj Lake Palace', price: 45000, rating: 4.9, latOffset: 0.005, lngOffset: -0.003 },
+        { name: 'The Leela Palace Udaipur', price: 38000, rating: 4.8, latOffset: -0.004, lngOffset: 0.006 }
       ],
       tours: [
-        { name: 'City Palace & Heritage Walk', price: '₹2,500', duration: 'Half Day' }
+        { name: 'City Palace & Heritage Walk', price: 2500, duration: 'Half Day' }
       ]
     },
     {
@@ -57,11 +59,11 @@ async function main() {
         { name: 'Hadimba Temple', description: 'Historic wooden temple nestled in cedar forests.' }
       ],
       hotels: [
-        { name: 'The Himalayan Resort', price: '₹12,000/night', rating: 4.7 },
-        { name: 'Span Resort & Spa', price: '₹14,500/night', rating: 4.6 }
+        { name: 'The Himalayan Resort', price: 12000, rating: 4.7, latOffset: 0.009, lngOffset: 0.004 },
+        { name: 'Span Resort & Spa', price: 14500, rating: 4.6, latOffset: -0.015, lngOffset: -0.010 }
       ],
       tours: [
-        { name: 'Solang Valley & Rohtang Pass Tour', price: '₹3,500', duration: 'Full Day' }
+        { name: 'Solang Valley & Rohtang Pass Tour', price: 3500, duration: 'Full Day' }
       ]
     },
     {
@@ -75,10 +77,10 @@ async function main() {
         { name: 'Munnar Tea Gardens', description: 'Rolling misty green hills covered with tea plantations.' }
       ],
       hotels: [
-        { name: 'Kumarakom Lake Resort', price: '₹22,000/night', rating: 4.9 }
+        { name: 'Kumarakom Lake Resort', price: 22000, rating: 4.9, latOffset: 0.008, lngOffset: 0.012 }
       ],
       tours: [
-        { name: 'Houseboat Day Cruise', price: '₹6,000', duration: 'Full Day' }
+        { name: 'Houseboat Day Cruise', price: 6000, duration: 'Full Day' }
       ]
     },
     {
@@ -92,10 +94,10 @@ async function main() {
         { name: 'Amer Fort', description: 'Hilltop fortress featuring royal courtyards and mirror palace.' }
       ],
       hotels: [
-        { name: 'Rambagh Palace', price: '₹48,000/night', rating: 4.9 }
+        { name: 'Rambagh Palace', price: 48000, rating: 4.9, latOffset: 0.007, lngOffset: -0.005 }
       ],
       tours: [
-        { name: 'Royal Forts & Bazaars Tour', price: '₹2,200', duration: 'Full Day' }
+        { name: 'Royal Forts & Bazaars Tour', price: 2200, duration: 'Full Day' }
       ]
     },
     {
@@ -109,10 +111,10 @@ async function main() {
         { name: 'Nubra Valley', description: 'High altitude cold desert with double-humped camels.' }
       ],
       hotels: [
-        { name: 'The Grand Dragon Ladakh', price: '₹16,000/night', rating: 4.7 }
+        { name: 'The Grand Dragon Ladakh', price: 16000, rating: 4.7, latOffset: 0.004, lngOffset: 0.003 }
       ],
       tours: [
-        { name: 'Pangong & Nubra Valley 3-Day Expedition', price: '₹14,000', duration: '3 Days' }
+        { name: 'Pangong & Nubra Valley 3-Day Expedition', price: 14000, duration: '3 Days' }
       ]
     },
     {
@@ -126,10 +128,10 @@ async function main() {
         { name: 'Agra Fort', description: 'Historic 16th-century fortress of Mughal emperors.' }
       ],
       hotels: [
-        { name: 'The Oberoi Amarvilas', price: '₹42,000/night', rating: 4.9 }
+        { name: 'The Oberoi Amarvilas', price: 42000, rating: 4.9, latOffset: -0.003, lngOffset: 0.008 }
       ],
       tours: [
-        { name: 'Sunrise Taj Mahal Tour', price: '₹1,500', duration: 'Half Day' }
+        { name: 'Sunrise Taj Mahal Tour', price: 1500, duration: 'Half Day' }
       ]
     },
     {
@@ -143,10 +145,10 @@ async function main() {
         { name: 'Kashi Vishwanath Temple', description: 'Renowned Golden Temple dedicated to Lord Shiva.' }
       ],
       hotels: [
-        { name: 'BrijRama Palace Varanasi', price: '₹26,000/night', rating: 4.8 }
+        { name: 'BrijRama Palace Varanasi', price: 26000, rating: 4.8, latOffset: 0.006, lngOffset: -0.004 }
       ],
       tours: [
-        { name: 'Ganga Boat Ride & Ghats Tour', price: '₹1,200', duration: '3 Hours' }
+        { name: 'Ganga Boat Ride & Ghats Tour', price: 1200, duration: '3 Hours' }
       ]
     },
     {
@@ -160,28 +162,23 @@ async function main() {
         { name: 'Jakhu Temple', description: 'Ancient temple on peak dedicated to Lord Hanuman.' }
       ],
       hotels: [
-        { name: 'Wildflower Hall Shimla', price: '₹32,000/night', rating: 4.9 }
+        { name: 'Wildflower Hall Shimla', price: 32000, rating: 4.9, latOffset: -0.008, lngOffset: 0.015 }
       ],
       tours: [
-        { name: 'Kufri & Chail Day Excursion', price: '₹2,800', duration: 'Full Day' }
+        { name: 'Kufri & Chail Day Excursion', price: 2800, duration: 'Full Day' }
       ]
     }
   ];
 
+  // Clean old destination-linked items to allow seamless re-seeding
+  await prisma.placeToVisit.deleteMany({});
+  await prisma.hotel.deleteMany({});
+  await prisma.tour.deleteMany({});
+  await prisma.destination.deleteMany({});
+
   for (const dest of destinations) {
-    await prisma.destination.upsert({
-      where: { id: dest.id },
-      update: {
-        name: dest.name,
-        state: dest.state,
-        country: dest.country,
-        description: dest.description,
-        image: dest.image,
-        type: dest.type,
-        latitude: dest.latitude,
-        longitude: dest.longitude
-      },
-      create: {
+    await prisma.destination.create({
+      data: {
         id: dest.id,
         name: dest.name,
         state: dest.state,
@@ -192,29 +189,35 @@ async function main() {
         latitude: dest.latitude,
         longitude: dest.longitude,
         placesToVisit: {
-          create: dest.places.map(p => ({
+          create: dest.places.map((p) => ({
             name: p.name,
             description: p.description,
-            image: dest.image
-          }))
+            image: dest.image,
+          })),
         },
         hotels: {
-          create: dest.hotels.map(h => ({
+          create: dest.hotels.map((h) => ({
             name: h.name,
             price: h.price,
             rating: h.rating,
-            image: dest.image
-          }))
+            image: dest.image,
+            location: `${dest.name}, ${dest.state}`,
+            latitude: dest.latitude + h.latOffset,
+            longitude: dest.longitude + h.lngOffset,
+            amenities: 'WiFi, AC, Breakfast, Pool, Parking',
+            isVerified: true,
+            isActive: true,
+          })),
         },
         tours: {
-          create: dest.tours.map(t => ({
+          create: dest.tours.map((t) => ({
             name: t.name,
             price: t.price,
             duration: t.duration,
-            image: dest.image
-          }))
-        }
-      }
+            image: dest.image,
+          })),
+        },
+      },
     });
     console.log(`Seeded destination: ${dest.name}`);
   }
@@ -234,7 +237,7 @@ async function main() {
       perKm: true,
       image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80',
       features: JSON.stringify(['AC', 'Complimentary Water', 'English Speaking Driver', 'Fastag', 'Clean Interior']),
-      recommended: true
+      recommended: true,
     },
     {
       slug: 'shiv-taxi',
@@ -249,7 +252,7 @@ async function main() {
       perKm: true,
       image: 'https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&w=800&q=80',
       features: JSON.stringify(['AC', 'Music System', 'USB Charging', 'Verified Driver']),
-      recommended: false
+      recommended: false,
     },
     {
       slug: 'premium-rides',
@@ -264,15 +267,15 @@ async function main() {
       perKm: true,
       image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80',
       features: JSON.stringify(['Luxury Leather', 'Chauffeur', 'Complimentary WiFi', 'Chilled Beverages']),
-      recommended: true
-    }
+      recommended: true,
+    },
   ];
 
   for (const t of taxis) {
     await prisma.taxi.upsert({
       where: { slug: t.slug },
       update: t,
-      create: t
+      create: t,
     });
     console.log(`Seeded taxi: ${t.name}`);
   }
@@ -287,7 +290,7 @@ async function main() {
       rating: 4.8,
       priceForTwo: 900,
       image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
-      features: JSON.stringify(['AC Dining', 'Unlimited Thali', 'Valet Parking', 'Pure Vegetarian'])
+      features: JSON.stringify(['AC Dining', 'Unlimited Thali', 'Valet Parking', 'Pure Vegetarian']),
     },
     {
       slug: 'havmor-restaurant',
@@ -297,7 +300,7 @@ async function main() {
       rating: 4.6,
       priceForTwo: 1100,
       image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-      features: JSON.stringify(['Family Friendly', 'Dessert Parlour', 'Outdoor Seating', 'Live Kitchen'])
+      features: JSON.stringify(['Family Friendly', 'Dessert Parlour', 'Outdoor Seating', 'Live Kitchen']),
     },
     {
       slug: 'spice-court',
@@ -307,15 +310,15 @@ async function main() {
       rating: 4.7,
       priceForTwo: 1400,
       image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-      features: JSON.stringify(['Courtyard Seating', 'Live Folk Music', 'Full Bar', 'Heritage Ambience'])
-    }
+      features: JSON.stringify(['Courtyard Seating', 'Live Folk Music', 'Full Bar', 'Heritage Ambience']),
+    },
   ];
 
   for (const r of restaurants) {
     await prisma.restaurant.upsert({
       where: { slug: r.slug },
       update: r,
-      create: r
+      create: r,
     });
     console.log(`Seeded restaurant: ${r.name}`);
   }
@@ -330,7 +333,7 @@ async function main() {
       price: 15999,
       rating: 4.8,
       image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80',
-      highlights: JSON.stringify(['North & South Goa Sightseeing', 'Mandovi Luxury Sunset Cruise', '4-Star Beach Resort Stay', 'Airport Transfers Included'])
+      highlights: JSON.stringify(['North & South Goa Sightseeing', 'Mandovi Luxury Sunset Cruise', '4-Star Beach Resort Stay', 'Airport Transfers Included']),
     },
     {
       slug: 'manali-trip',
@@ -340,7 +343,7 @@ async function main() {
       price: 18499,
       rating: 4.7,
       image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80',
-      highlights: JSON.stringify(['Solang Valley Paragliding', 'Rohtang Pass Snow Excursion', 'River Rafting in Beas', 'Campfire & DJ Night'])
+      highlights: JSON.stringify(['Solang Valley Paragliding', 'Rohtang Pass Snow Excursion', 'River Rafting in Beas', 'Campfire & DJ Night']),
     },
     {
       slug: 'kerala-tour',
@@ -350,43 +353,59 @@ async function main() {
       price: 24999,
       rating: 4.9,
       image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80',
-      highlights: JSON.stringify(['Private Deluxe Houseboat Stay', 'Munnar Tea Plantations', 'Periyar Wildlife Sanctuary', 'Authentic Kerala Meals'])
-    }
+      highlights: JSON.stringify(['Private Deluxe Houseboat Stay', 'Munnar Tea Plantations', 'Periyar Wildlife Sanctuary', 'Authentic Kerala Meals']),
+    },
   ];
 
   for (const p of packages) {
     await prisma.package.upsert({
       where: { slug: p.slug },
       update: p,
-      create: p
+      create: p,
     });
     console.log(`Seeded package: ${p.name}`);
   }
 
-  // 5. Users Seed (Partner and Traveler)
-  await prisma.user.upsert({
-    where: { email: 'partner@yatrasangi.com' },
-    update: {},
-    create: {
+  // 5. System Users Seed with Hashed Passwords & RBAC Roles
+  const defaultPassword = await bcrypt.hash('password123', 10);
+
+  const users = [
+    {
+      email: 'admin@yatrasangi.com',
+      password: defaultPassword,
+      name: 'System Administrator',
+      role: 'ADMIN',
+    },
+    {
+      email: 'hotelier@yatrasangi.com',
+      password: defaultPassword,
+      name: 'Vikram Mehta (Hotelier Partner)',
+      role: 'HOTEL_OWNER',
+    },
+    {
       email: 'partner@yatrasangi.com',
-      password: 'password123',
-      name: 'Ramesh Patel (Driver & Fleet Partner)',
-      role: 'PARTNER'
-    }
-  });
-
-  await prisma.user.upsert({
-    where: { email: 'traveler@yatrasangi.com' },
-    update: {},
-    create: {
+      password: defaultPassword,
+      name: 'Ramesh Patel (Driver & Fleet Captain)',
+      role: 'DRIVER',
+    },
+    {
       email: 'traveler@yatrasangi.com',
-      password: 'password123',
+      password: defaultPassword,
       name: 'Raj Patel (YaatraSangi Traveler)',
-      role: 'TRAVELER'
-    }
-  });
+      role: 'TRAVELLER',
+    },
+  ];
 
-  console.log('✅ YaatraSangi database seeded completely with all real destinations, taxis, restaurants, packages and users!');
+  for (const u of users) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: { password: u.password, role: u.role, name: u.name },
+      create: u,
+    });
+    console.log(`Seeded user: ${u.email} [${u.role}]`);
+  }
+
+  console.log('✅ YaatraSangi database seeded completely with real destinations, hotels, taxis, restaurants, packages and RBAC users!');
 }
 
 main()

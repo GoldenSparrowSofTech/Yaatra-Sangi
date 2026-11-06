@@ -11,9 +11,23 @@ export class TaxisService {
       whereClause = { location: { contains: pickup } };
     }
     const taxis = await this.prisma.taxi.findMany({ where: whereClause });
-    return taxis.map(t => ({
-      ...t,
-      features: JSON.parse(t.features)
-    }));
+    return taxis.map((t) => {
+      let parsedFeatures: string[] = [];
+      try {
+        parsedFeatures = typeof t.features === 'string' ? JSON.parse(t.features) : t.features;
+      } catch {
+        parsedFeatures = [t.features];
+      }
+
+      const price = typeof t.price === 'object' && (t.price as any)?.toNumber
+        ? (t.price as any).toNumber()
+        : Number(t.price) || 0;
+
+      return {
+        ...t,
+        price,
+        features: parsedFeatures,
+      };
+    });
   }
 }

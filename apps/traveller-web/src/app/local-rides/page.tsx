@@ -39,7 +39,8 @@ export default function LocalRidesPage() {
 
   useEffect(() => {
     // Connect to NestJS WebSocket Gateway
-    const newSocket = io('http://localhost:3001');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const newSocket = io(apiUrl);
     setSocket(newSocket);
 
     newSocket.on('connect', () => {

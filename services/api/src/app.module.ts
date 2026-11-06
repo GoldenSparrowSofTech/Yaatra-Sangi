@@ -11,9 +11,26 @@ import { LocalRidesModule } from './local-rides/local-rides.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
 import { RestaurantsModule } from './restaurants/restaurants.module.js';
 import { PackagesModule } from './packages/packages.module.js';
+import { RoutingModule } from './routing/routing.module.js';
+import { BookingsModule } from './bookings/bookings.module.js';
+import { PaymentsModule } from './payments/payments.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, DestinationsModule, HotelsModule, TaxisModule, VendorModule, LocalRidesModule, ReviewsModule, RestaurantsModule, PackagesModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    DestinationsModule,
+    HotelsModule,
+    TaxisModule,
+    VendorModule,
+    LocalRidesModule,
+    ReviewsModule,
+    RestaurantsModule,
+    PackagesModule,
+    RoutingModule,
+    BookingsModule,
+    PaymentsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

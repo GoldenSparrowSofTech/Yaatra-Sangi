@@ -50,7 +50,7 @@ export default function RootLayout({
                 <span className="text-[#0d59a8]">Yaatra</span><span className="text-[#f97316]">Sangi</span>
               </span>
             </div>
-            <nav className="hidden 2xl:flex gap-3 text-[13px] font-medium text-slate-300 justify-center flex-1 px-2">
+            <nav className="hidden lg:flex gap-5 text-sm font-semibold text-slate-300 justify-center flex-1 px-4">
               <Link href="/" className="hover:text-white transition-colors whitespace-nowrap">Home</Link>
               <Link href="/destinations" className="hover:text-white transition-colors whitespace-nowrap">Destinations</Link>
               <Link href="/plan" className="hover:text-white transition-colors whitespace-nowrap">Trip Planner</Link>
@@ -69,7 +69,7 @@ export default function RootLayout({
         <LanguageTranslator />
 
         {/* Main Content */}
-        <div className="pt-20 min-h-screen">
+        <div className="min-h-screen">
           {children}
         </div>
 

@@ -17,19 +17,20 @@ export default function DashboardPage() {
   if (!userData) return null;
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 md:p-12">
+    <div className="min-h-screen bg-slate-950 p-6 md:p-12 pt-28">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-2">Welcome, {userData.name}! 👋</h1>
+        <h1 className="text-4xl font-bold text-white mb-2">Welcome, {userData.name || userData.email?.split('@')[0] || 'Traveler'}! 👋</h1>
         <p className="text-slate-400 mb-10">Manage your trips and explore history.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
             <h2 className="text-xl font-bold text-white mb-4">Profile Info</h2>
             <div className="space-y-3">
-              <p className="text-slate-400">Name: <span className="text-white">{userData.name}</span></p>
-              <p className="text-slate-400">Mobile: <span className="text-white">+91 {userData.mobile}</span></p>
-              <p className="text-slate-400">City: <span className="text-white">{userData.city}</span></p>
-              <p className="text-slate-400">State: <span className="text-white">{userData.state}</span></p>
+              <p className="text-slate-400">Name: <span className="text-white font-medium">{userData.name || userData.email?.split('@')[0] || 'Traveler'}</span></p>
+              <p className="text-slate-400">Email: <span className="text-white font-medium">{userData.email || 'traveler@yatrasangi.com'}</span></p>
+              <p className="text-slate-400">Mobile: <span className="text-white font-medium">+91 {userData.mobile || '9876543210'}</span></p>
+              <p className="text-slate-400">City: <span className="text-white font-medium">{userData.city || 'Ahmedabad'}</span></p>
+              <p className="text-slate-400">State: <span className="text-white font-medium">{userData.state || 'Gujarat'}</span></p>
             </div>
           </div>
 

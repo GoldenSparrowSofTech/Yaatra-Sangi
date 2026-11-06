@@ -33,7 +33,7 @@ export default function PlanTripPage() {
           // 1. Try our Backend API
           let results: Location[] = [];
           try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
             const beResponse = await fetch(`${apiUrl}/destinations?search=${newCity}`);
             if (beResponse.ok) {
                const beData = await beResponse.json();
@@ -137,7 +137,7 @@ export default function PlanTripPage() {
     return R * c;
   };
 
-  const handleOptimize = () => {
+  const handleOptimize = async () => {
     if (destinations.length < 2) {
       alert("Please add at least 2 destinations to optimize a route.");
       return;
@@ -145,6 +145,41 @@ export default function PlanTripPage() {
 
     setIsOptimizing(true);
     setRouteResult(null);
+
+    // 1. Try Backend Route Optimizer Service
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    try {
+      const beRes = await fetch(`${apiUrl}/routing/optimize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destinations: destinations.map(d => ({ name: d.name, latitude: d.lat, longitude: d.lon })),
+          mode: 'RECOMMENDED'
+        })
+      });
+      if (beRes.ok) {
+        const beData = await beRes.json();
+        const optimized = beData.orderedDestinations.map((d: any) => ({
+          name: d.name,
+          lat: d.latitude,
+          lon: d.longitude
+        }));
+        setDestinations(optimized);
+        const distanceKm = beData.totalDistanceKm;
+        const timeHours = (beData.totalDurationMinutes || (distanceKm / 60)) / 60;
+        const taxiCost = Math.round(distanceKm * 12);
+        setRouteResult({
+          distance: `${Math.round(distanceKm)} km`,
+          time: `${Math.floor(timeHours)} hrs ${Math.round((timeHours % 1) * 60)} mins`,
+          stops: optimized.length,
+          cost: `₹ ${taxiCost.toLocaleString('en-IN')}`
+        });
+        setIsOptimizing(false);
+        return;
+      }
+    } catch (e) {
+      console.log('Backend route optimizer unreachable, falling back to local solver', e);
+    }
 
     // AI Route Optimization (Nearest Neighbor + 2-Opt Algorithm)
     setTimeout(async () => {

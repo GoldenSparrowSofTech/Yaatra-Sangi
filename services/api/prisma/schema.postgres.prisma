@@ -1,0 +1,257 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+enum Role {
+  TRAVELLER
+  HOTEL_OWNER
+  HOTEL_STAFF
+  TAXI_OWNER
+  DRIVER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum BookingType {
+  HOTEL
+  CAB
+  TOUR
+  PACKAGE
+}
+
+enum BookingStatus {
+  PENDING
+  HELD
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  STARTED
+  COMPLETED
+  CANCELLED
+}
+
+enum VehicleType {
+  BIKE
+  AUTO
+  CAB
+  AMBULANCE
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  name        String?
+  phone       String?
+  role        Role      @default(TRAVELLER)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  bookings    Booking[]
+  rides       Ride[]    @relation("UserRides")
+  driverRides Ride[]    @relation("DriverRides")
+  hotels      Hotel[]
+  reviews     Review[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Destination {
+  id            String         @id @default(uuid())
+  name          String
+  state         String
+  country       String         @default("India")
+  description   String?
+  image         String?
+  type          String?
+  latitude      Float?
+  longitude     Float?
+  createdAt     DateTime       @default(now()) @db.Timestamptz
+  updatedAt     DateTime       @updatedAt @db.Timestamptz
+  deletedAt     DateTime?      @db.Timestamptz
+
+  placesToVisit PlaceToVisit[]
+  hotels        Hotel[]
+  tours         Tour[]
+
+  @@index([name])
+}
+
+model PlaceToVisit {
+  id            Int         @id @default(autoincrement())
+  name          String
+  description   String?
+  image         String?
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now()) @db.Timestamptz
+  updatedAt     DateTime    @updatedAt @db.Timestamptz
+
+  @@index([destinationId])
+}
+
+model Hotel {
+  id            Int         @id @default(autoincrement())
+  name          String
+  price         Decimal     @default(0) @db.Decimal(10, 2)
+  rating        Float?      @default(4.5)
+  image         String?
+  location      String?
+  address       String?
+  latitude      Float?
+  longitude     Float?
+  amenities     Json?
+  isVerified    Boolean     @default(true)
+  isActive      Boolean     @default(true)
+  ownerId       String?
+  owner         User?       @relation(fields: [ownerId], references: [id])
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now()) @db.Timestamptz
+  updatedAt     DateTime    @updatedAt @db.Timestamptz
+  deletedAt     DateTime?   @db.Timestamptz
+
+  @@index([destinationId])
+  @@index([isVerified, isActive])
+}
+
+model Tour {
+  id            Int         @id @default(autoincrement())
+  name          String
+  price         Decimal     @default(0) @db.Decimal(10, 2)
+  duration      String?
+  image         String?
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now()) @db.Timestamptz
+  updatedAt     DateTime    @updatedAt @db.Timestamptz
+  deletedAt     DateTime?   @db.Timestamptz
+
+  @@index([destinationId])
+}
+
+model Booking {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  type           BookingType
+  status         BookingStatus @default(PENDING)
+  totalAmount    Decimal       @default(0) @db.Decimal(10, 2)
+  holdExpiresAt  DateTime?     @db.Timestamptz
+  idempotencyKey String?       @unique
+  details        Json?
+  createdAt      DateTime      @default(now()) @db.Timestamptz
+  updatedAt      DateTime      @updatedAt @db.Timestamptz
+
+  @@index([userId])
+  @@index([status])
+  @@index([holdExpiresAt])
+}
+
+model Ride {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation("UserRides", fields: [userId], references: [id])
+  driverId    String?
+  driver      User?       @relation("DriverRides", fields: [driverId], references: [id])
+  pickup      String
+  pickupLat   Float?
+  pickupLng   Float?
+  drop        String
+  dropLat     Float?
+  dropLng     Float?
+  vehicleType VehicleType @default(BIKE)
+  status      RideStatus  @default(REQUESTED)
+  price       Decimal     @default(0) @db.Decimal(10, 2)
+  otpPin      String?
+  createdAt   DateTime    @default(now()) @db.Timestamptz
+  updatedAt   DateTime    @updatedAt @db.Timestamptz
+
+  @@index([userId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model Taxi {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  type        String
+  model       String
+  location    String
+  capacity    String
+  bags        String
+  rating      Float?   @default(4.8)
+  price       Decimal  @default(0) @db.Decimal(10, 2)
+  perKm       Boolean  @default(false)
+  image       String?
+  features    Json
+  recommended Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([location])
+}
+
+model Restaurant {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  cuisine     String
+  location    String
+  rating      Float?   @default(4.5)
+  priceForTwo Decimal  @default(0) @db.Decimal(10, 2)
+  image       String?
+  features    Json
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([location])
+}
+
+model Package {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  destination String
+  duration    String
+  price       Decimal  @default(0) @db.Decimal(10, 2)
+  rating      Float?   @default(4.7)
+  image       String?
+  highlights  Json
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([destination])
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  targetType String
+  targetId   String
+  rating     Int      @default(5)
+  comment    String?
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @updatedAt @db.Timestamptz
+
+  @@index([targetType, targetId])
+}
+

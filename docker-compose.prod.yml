@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: yaatrasangi-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-travel_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-travel_password}
+      POSTGRES_DB: ${POSTGRES_DB:-travel_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-travel_user} -d ${POSTGRES_DB:-travel_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yaatrasangi-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: yaatrasangi-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yaatrasangi-network
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: yaatrasangi-api
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-travel_user}:${POSTGRES_PASSWORD:-travel_password}@postgres:5432/${POSTGRES_DB:-travel_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-yaatrasangi_production_jwt_secret_key_2026}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-mock_key_id}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-mock_key_secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - yaatrasangi-network
+
+  web:
+    build:
+      context: ./apps/traveller-web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    container_name: yaatrasangi-web
+    restart: always
+    depends_on:
+      - api
+    networks:
+      - yaatrasangi-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: yaatrasangi-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - api
+      - web
+    networks:
+      - yaatrasangi-network
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  yaatrasangi-network:
+    driver: bridge
+

@@ -10,3 +10,9 @@ coverage/
 out/
 .vercel/
 .turbo/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+*.tsbuildinfo
+legacy_archive/backend/*.sqlite

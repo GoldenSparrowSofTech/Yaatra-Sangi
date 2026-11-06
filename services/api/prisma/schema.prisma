@@ -8,26 +8,38 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  role      String   @default("TRAVELER") // TRAVELER or PARTNER
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  bookings  Booking[]
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  name        String?
+  phone       String?
+  role        String    @default("TRAVELLER") // TRAVELLER, HOTEL_OWNER, HOTEL_STAFF, TAXI_OWNER, DRIVER, ADMIN, SUPER_ADMIN
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  deletedAt   DateTime?
+
+  bookings    Booking[]
+  rides       Ride[]    @relation("UserRides")
+  driverRides Ride[]    @relation("DriverRides")
+  hotels      Hotel[]
+  reviews     Review[]
 }
 
 model Destination {
-  id            String          @id @default(uuid()) // Can use string IDs like "goa"
+  id            String         @id @default(uuid())
   name          String
   state         String
-  country       String
+  country       String         @default("India")
   description   String?
   image         String?
-  type          String?         // Trending, Romantic, etc.
+  type          String?        // Beach, Hill Station, Heritage, Romantic, etc.
   latitude      Float?
   longitude     Float?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+  deletedAt     DateTime?
+
   placesToVisit PlaceToVisit[]
   hotels        Hotel[]
   tours         Tour[]
@@ -39,91 +51,135 @@ model PlaceToVisit {
   description   String?
   image         String?
   destinationId String
-  destination   Destination @relation(fields: [destinationId], references: [id])
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
 }
 
 model Hotel {
   id            Int         @id @default(autoincrement())
   name          String
-  price         String
-  rating        Float?
+  price         Decimal     @default(0)
+  rating        Float?      @default(4.5)
   image         String?
+  location      String?
+  address       String?
+  latitude      Float?
+  longitude     Float?
+  amenities     String?     // Comma-separated or JSON string
+  isVerified    Boolean     @default(true)
+  isActive      Boolean     @default(true)
+  ownerId       String?
+  owner         User?       @relation(fields: [ownerId], references: [id])
   destinationId String
-  destination   Destination @relation(fields: [destinationId], references: [id])
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  deletedAt     DateTime?
 }
 
 model Tour {
   id            Int         @id @default(autoincrement())
   name          String
-  price         String
+  price         Decimal     @default(0)
   duration      String?
   image         String?
   destinationId String
-  destination   Destination @relation(fields: [destinationId], references: [id])
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  deletedAt     DateTime?
 }
 
 model Booking {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String   // HOTEL, CAB, TOUR, PACKAGE
-  status    String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
-  details   String?  // JSON string for specific details
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  type           String    // HOTEL, CAB, TOUR, PACKAGE
+  status         String    @default("PENDING") // PENDING, HELD, CONFIRMED, COMPLETED, CANCELLED, EXPIRED
+  totalAmount    Decimal   @default(0)
+  holdExpiresAt  DateTime?
+  idempotencyKey String?   @unique
+  details        String?   // JSON string of specific itinerary details
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
 }
 
 model Ride {
-  id            String   @id @default(uuid())
-  userId        String
-  driverId      String?
-  pickup        String
-  drop          String
-  vehicleType   String
-  status        String   @default("REQUESTED") // REQUESTED, ACCEPTED, STARTED, COMPLETED
-  price         Float?
-  otpPin        String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation("UserRides", fields: [userId], references: [id])
+  driverId    String?
+  driver      User?     @relation("DriverRides", fields: [driverId], references: [id])
+  pickup      String
+  pickupLat   Float?
+  pickupLng   Float?
+  drop        String
+  dropLat     Float?
+  dropLng     Float?
+  vehicleType String    // bike, auto, cab, ambulance
+  status      String    @default("REQUESTED") // REQUESTED, ACCEPTED, STARTED, COMPLETED, CANCELLED
+  price       Decimal   @default(0)
+  otpPin      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
 }
 
 model Taxi {
-  id            Int      @id @default(autoincrement())
-  slug          String   @unique
-  name          String
-  type          String
-  model         String
-  location      String
-  capacity      String
-  bags          String
-  rating        Float?
-  price         Int
-  perKm         Boolean  @default(false)
-  image         String?
-  features      String   // Storing JSON string for features array
-  recommended   Boolean  @default(false)
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  type        String
+  model       String
+  location    String
+  capacity    String
+  bags        String
+  rating      Float?   @default(4.8)
+  price       Decimal  @default(0)
+  perKm       Boolean  @default(false)
+  image       String?
+  features    String   // JSON string of feature tags
+  recommended Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 model Restaurant {
-  id            Int      @id @default(autoincrement())
-  slug          String   @unique
-  name          String
-  cuisine       String
-  location      String
-  rating        Float?
-  priceForTwo   Int
-  image         String?
-  features      String   // Storing JSON string for features array
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  cuisine     String
+  location    String
+  rating      Float?   @default(4.5)
+  priceForTwo Decimal  @default(0)
+  image       String?
+  features    String   // JSON string of feature tags
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 model Package {
-  id            Int      @id @default(autoincrement())
-  slug          String   @unique
-  name          String
-  destination   String
-  duration      String
-  price         Int
-  rating        Float?
-  image         String?
-  highlights    String   // Storing JSON string
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  destination String
+  duration    String
+  price       Decimal  @default(0)
+  rating      Float?   @default(4.7)
+  image       String?
+  highlights  String   // JSON string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  targetType String   // DESTINATION, HOTEL, TAXI, PACKAGE, RESTAURANT
+  targetId   String
+  rating     Int      @default(5)
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 }

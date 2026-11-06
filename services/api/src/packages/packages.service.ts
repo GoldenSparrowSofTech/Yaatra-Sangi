@@ -11,17 +11,30 @@ export class PackagesService {
       whereClause = { destination: { contains: location } };
     }
     const packages = await this.prisma.package.findMany({ where: whereClause });
-    return packages.map(p => ({
-      id: p.id,
-      slug: p.slug,
-      title: p.name,
-      duration: p.duration,
-      price: p.price,
-      image: p.image,
-      rating: p.rating,
-      reviews: 124, // Mock
-      features: JSON.parse(p.highlights),
-      vendorName: 'Local Agent'
-    }));
+    return packages.map((p) => {
+      let parsedHighlights: string[] = [];
+      try {
+        parsedHighlights = typeof p.highlights === 'string' ? JSON.parse(p.highlights) : p.highlights;
+      } catch {
+        parsedHighlights = [p.highlights];
+      }
+
+      const price = typeof p.price === 'object' && (p.price as any)?.toNumber
+        ? (p.price as any).toNumber()
+        : Number(p.price) || 0;
+
+      return {
+        id: p.id,
+        slug: p.slug,
+        title: p.name,
+        duration: p.duration,
+        price,
+        image: p.image,
+        rating: p.rating,
+        reviews: 124, // Mock
+        features: parsedHighlights,
+        vendorName: 'Local Agent',
+      };
+    });
   }
 }
