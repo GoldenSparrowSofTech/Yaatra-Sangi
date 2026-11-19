@@ -96,5 +96,11 @@ export const ApiService = {
       return false;
     }
   },
+
+  async getDestinations(): Promise<Destination[]> {
+    return this.fetchDestinations();
+  },
 };
+
+export const apiService = ApiService;
 

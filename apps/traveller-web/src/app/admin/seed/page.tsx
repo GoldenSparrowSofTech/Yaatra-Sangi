@@ -32,44 +32,21 @@ export default function SeedDatabasePage() {
   const [loading, setLoading] = useState(false);
 
   const seedData = async () => {
-    setLoading(true);
-    setStatus("Seeding hotels...");
-    try {
-      for (const item of mockHotels) await setDoc(doc(db, "hotels", item.id), item);
-      
-      setStatus("Seeding taxis...");
-      for (const item of mockTaxis) await setDoc(doc(db, "taxis", item.id), item);
-      
-      setStatus("Seeding restaurants...");
-      for (const item of mockRestaurants) await setDoc(doc(db, "restaurants", item.id), item);
-      
-      setStatus("Seeding packages...");
-      for (const item of mockPackages) await setDoc(doc(db, "packages", item.id), item);
-      
-      setStatus("Seeding rides...");
-      for (const item of mockRides) await setDoc(doc(db, "rides", item.id), item);
-
-      setStatus("Database seeding complete! All initial data uploaded to Firebase.");
-    } catch (err: any) {
-      console.error(err);
-      setStatus("Error: " + err.message);
-    }
-    setLoading(false);
+    setStatus("Disabled: Browser-based database mutation is restricted. Use server-side migrations/seed scripts.");
   };
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8">
       <h1 className="text-3xl font-bold text-white mb-4">Database Admin</h1>
-      <p className="text-slate-400 mb-8 max-w-md text-center">
-        This tool will upload the default demo data (Hotels, Taxis, Restaurants, etc.) to your connected Firebase Firestore database.
+      <p className="text-amber-400 mb-8 max-w-md text-center font-medium">
+        Browser-based database seeding is disabled for security (SEC-01). Database initialization must be executed through controlled backend server CLI commands only.
       </p>
 
       <button
-        onClick={seedData}
-        disabled={loading}
-        className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg disabled:opacity-50"
+        disabled={true}
+        className="px-8 py-4 bg-slate-800 text-slate-500 font-bold rounded-xl shadow-lg cursor-not-allowed opacity-50"
       >
-        {loading ? "Uploading Data..." : "Initialize Database"}
+        Database Seeding Disabled in Browser
       </button>
 
       <div className="mt-8 p-4 bg-slate-900 rounded-lg border border-slate-800 w-full max-w-md">

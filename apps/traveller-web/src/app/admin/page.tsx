@@ -11,24 +11,18 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      const isSuperAdmin = typeof window !== 'undefined' && localStorage.getItem('superAdminAuth') === 'true';
-      
-      setUser(currentUser || (isSuperAdmin ? { email: 'superAdmin' } : null));
-      setLoading(false);
-      
-      // Basic client-side protection
-      if (currentUser && currentUser.email !== 'admin@travelpartner.com' && currentUser.email !== 'admin@gmail.com' && !isSuperAdmin) {
-        // window.location.href = "/";
-      } else if (!currentUser && !isSuperAdmin) {
+      if (!currentUser) {
         window.location.href = "/login";
+        return;
       }
+      setUser(currentUser);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   const handleLogout = async () => {
-    localStorage.removeItem('superAdminAuth');
     await signOut(auth);
     window.location.href = "/login";
   };

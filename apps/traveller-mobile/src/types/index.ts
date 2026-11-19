@@ -19,7 +19,7 @@ export interface Destination {
   name: string;
   state?: string;
   country?: string;
-  rating?: string;
+  rating?: string | number;
   subtitle?: string;
   description?: string;
   image?: string;

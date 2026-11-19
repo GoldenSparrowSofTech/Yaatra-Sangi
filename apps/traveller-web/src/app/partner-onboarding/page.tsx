@@ -20,29 +20,22 @@ export default function PartnerOnboarding() {
     
     setIsVerifying(true);
     setVerificationResult(null);
-    setScanStep(1);
 
-    // Simulated step-by-step AI Scanning
-    setTimeout(() => setScanStep(2), 1500); // Checking RC
-    setTimeout(() => setScanStep(3), 3000); // Checking Insurance
-    setTimeout(() => setScanStep(4), 4500); // Checking Fitness
-
+    // SEC-08: Transition to server-owned PENDING_REVIEW state (no fake simulated AI auto-pass)
     setTimeout(() => {
       setIsVerifying(false);
-      setScanStep(0);
-      
-      // Simulated Output
       setVerificationResult({
         success: true, 
-        message: `✅ All Documents Verified for ${vehicleType === 'bike' ? 'Bike Taxi' : 'Commercial Cab'}!`,
+        message: `📋 Documents Submitted for Admin Review (Status: PENDING_REVIEW)`,
         details: [
-          "Registration (RC): Valid Commercial Vehicle",
-          "Insurance: Valid (Expires in 8 months)",
-          "Fitness & Passing: Valid and Active",
-          "Blacklist Check: No pending challans found"
+          `Category: ${vehicleType === 'bike' ? 'Bike Taxi (Permanently Free)' : 'Commercial Cab (Permanently Free)'}`,
+          `Registration Document: ${rcFile.name}`,
+          `Insurance Document: ${insuranceFile.name}`,
+          `Fitness Document: ${fitnessFile.name}`,
+          "Review Status: PENDING_REVIEW (Manual administrative review required before activation)"
         ]
       });
-    }, 6000);
+    }, 1000);
   };
 
   const allUploaded = rcFile && insuranceFile && fitnessFile;
@@ -98,7 +91,7 @@ export default function PartnerOnboarding() {
           {step === 2 && (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold text-white mb-2">2. Mandatory Document Upload</h2>
-              <p className="text-slate-400 mb-6">Our AI strict-checks the expiry date of Insurance, Fitness, and RC passing.</p>
+              <p className="text-slate-400 mb-6">Upload official vehicle and permit documents for administrative compliance review.</p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {/* RC Book */}
@@ -167,7 +160,7 @@ export default function PartnerOnboarding() {
                     ))}
                   </ul>
                   <div className="mt-6 p-4 bg-slate-950 rounded-lg border border-slate-800">
-                    <p className="text-sm text-slate-400">Note: If any of these documents were expired or fake, the AI would immediately block the driver account and reject the application.</p>
+                    <p className="text-sm text-slate-400">Note: All listings remain pending until identity and vehicle documents are verified by an administrator.</p>
                   </div>
                 </div>
               )}
@@ -184,7 +177,7 @@ export default function PartnerOnboarding() {
                   disabled={!allUploaded || isVerifying}
                   className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                 >
-                  {isVerifying ? 'Scanning AI...' : 'Verify All Documents'}
+                  {isVerifying ? 'Submitting...' : 'Submit Documents for Verification'}
                 </button>
               </div>
             </div>

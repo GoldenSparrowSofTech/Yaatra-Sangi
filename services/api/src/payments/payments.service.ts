@@ -30,11 +30,17 @@ export class PaymentsService {
   }
 
   async processWebhook(rawBody: string, signature: string, eventData: any) {
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || 'test_webhook_secret';
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new BadRequestException('Payment webhook secret is not configured in production');
+      }
+    }
+    const secret = webhookSecret || 'dev_test_webhook_secret';
     const isValid = await this.razorpayProvider.verifyWebhookSignature(
       rawBody,
       signature,
-      webhookSecret,
+      secret,
     );
 
     if (!isValid) {

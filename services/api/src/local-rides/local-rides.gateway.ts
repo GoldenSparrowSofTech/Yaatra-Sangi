@@ -49,7 +49,7 @@ export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconne
     return { event: 'online_status', data: { success: true } };
   }
 
-  // Customer requests a ride
+  // ADR-001: Customer ride request dispatch is quarantined from public execution
   @SubscribeMessage('request_ride')
   async handleRequestRide(
     @MessageBody() data: { 
@@ -60,21 +60,14 @@ export class LocalRidesGateway implements OnGatewayConnection, OnGatewayDisconne
     },
     @ConnectedSocket() client: Socket,
   ) {
-    // 1. Save booking to database via service
-    const booking = await this.localRidesService.createRideBooking(data);
-
-    // 2. Broadcast this new booking ONLY to active drivers matching the vehicle type
-    // In a real app, you would also calculate distance between pickup and driver location
-    for (const [driverId, driverData] of this.activeDrivers.entries()) {
-      // Basic matching: Driver must have the same vehicle type
-      if (driverData.vehicleType === data.vehicleType) {
-        // Send specific event to this driver's socket
-        this.server.to(driverData.socketId).emit('new_ride_request', booking);
-      }
-    }
-
-    // 3. Confirm to the customer that we are searching
-    return { event: 'ride_requested', data: booking };
+    console.warn('[ADR-001 Quarantine] Real-time ride dispatch request rejected. Direct contact directory in effect.');
+    return {
+      event: 'ride_dispatch_quarantined',
+      data: {
+        success: false,
+        message: 'On-demand ride dispatch is disabled per ADR-001. Please browse driver directory and contact directly.',
+      },
+    };
   }
 
   // Driver accepts a ride
