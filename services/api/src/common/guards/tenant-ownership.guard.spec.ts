@@ -50,9 +50,21 @@ describe('TenantOwnershipGuard', () => {
     expect(guard.canActivate(context)).toBe(true);
   });
 
+  it('should allow access if user is ADMIN', () => {
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({ paramName: 'userId' });
+    const context = createMockContext({ id: 'admin-2', role: Role.ADMIN }, { userId: 'managed-tenant' });
+    expect(guard.canActivate(context)).toBe(true);
+  });
+
   it('should block IDOR attempt when user ID does not match resource owner', () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({ paramName: 'userId' });
     const context = createMockContext({ id: 'attacker-1', role: Role.HOTEL_OWNER }, { userId: 'victim-2' });
+    expect(() => guard.canActivate(context)).toThrow('Access denied');
+  });
+
+  it('should block IDOR attempt when staff member attempts to access another tenant resource', () => {
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue({ paramName: 'userId' });
+    const context = createMockContext({ id: 'staff-1', role: Role.HOTEL_STAFF }, { userId: 'other-hotel-owner' });
     expect(() => guard.canActivate(context)).toThrow('Access denied');
   });
 });

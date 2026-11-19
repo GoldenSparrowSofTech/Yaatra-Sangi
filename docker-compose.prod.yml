@@ -24,12 +24,12 @@ services:
     image: redis:7-alpine
     container_name: yaatrasangi-redis
     restart: always
-    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_production_secret_key}
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set in production}
     # SEC-02: Do not expose Redis ports to host in production
     volumes:
       - redisdata:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_production_secret_key}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:?REDIS_PASSWORD must be set in production}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,6 +47,9 @@ services:
       PORT: 3001
       DATABASE_URL: postgresql://${POSTGRES_USER:-travel_user}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-travel_db}?schema=public
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in production}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set in production}
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
     depends_on:

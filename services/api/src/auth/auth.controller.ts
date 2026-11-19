@@ -15,11 +15,14 @@ import { RolesGuard } from './guards/roles.guard.js';
 import { Roles } from './decorators/roles.decorator.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { Role } from './enums/role.enum.js';
+import { Throttle } from '../common/guards/rate-limit.guard.js';
+import { RequireOwnership } from '../common/guards/tenant-ownership.guard.js';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Throttle(5, 60)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: any) {
@@ -30,12 +33,14 @@ export class AuthController {
     return this.authService.login(user);
   }
 
+  @Throttle(3, 60)
   @Post('register')
   async register(@Body() body: RegisterDto) {
     return this.authService.register(body);
   }
 
   @UseGuards(JwtAuthGuard)
+  @RequireOwnership({ paramName: 'userId' })
   @Get('profile')
   async getProfile(@CurrentUser('id') userId: string) {
     return this.authService.getProfile(userId);

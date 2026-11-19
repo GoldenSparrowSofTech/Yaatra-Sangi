@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -247,7 +248,7 @@ export class BookingsService {
       throw new NotFoundException(`Booking ${bookingId} not found`);
     }
     if (booking.userId !== userId) {
-      throw new BadRequestException('Access denied to this booking');
+      throw new ForbiddenException('Access denied to this booking');
     }
     return booking;
   }

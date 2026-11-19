@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BookingsService } from './bookings.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { PaymentsService } from '../payments/payments.service.js';
-import { ConflictException, BadRequestException } from '@nestjs/common';
+import { ConflictException, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 
 describe('BookingsService', () => {
   let service: BookingsService;
@@ -148,6 +148,36 @@ describe('BookingsService', () => {
         signature: 'valid_sig',
       }),
     ).rejects.toThrow(BadRequestException);
+  });
+
+  describe('IDOR & Resource Authorization (SEC-07)', () => {
+    it('should allow owner to access their own booking', async () => {
+      mockPrisma.booking.findUnique.mockResolvedValue({
+        id: 'book-100',
+        userId: 'owner-user',
+        totalAmount: 5000,
+      });
+
+      const result = await service.getBooking('owner-user', 'book-100');
+      expect(result).toBeDefined();
+      expect(result.id).toBe('book-100');
+    });
+
+    it('should throw ForbiddenException when user attempts to access another tenant booking (IDOR attempt)', async () => {
+      mockPrisma.booking.findUnique.mockResolvedValue({
+        id: 'book-200',
+        userId: 'victim-user',
+        totalAmount: 9000,
+      });
+
+      await expect(service.getBooking('attacker-user', 'book-200')).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw NotFoundException when booking does not exist', async () => {
+      mockPrisma.booking.findUnique.mockResolvedValue(null);
+
+      await expect(service.getBooking('user-1', 'nonexistent-id')).rejects.toThrow(NotFoundException);
+    });
   });
 });
 

@@ -4,12 +4,18 @@ import { AppModule } from './app.module.js';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // SEC-06: Baseline HTTP Security Headers
+  // SEC-04: Enable trust proxy for safe client IP resolution behind reverse proxy
+  const expressApp = app.getHttpAdapter().getInstance();
+  if (typeof expressApp?.set === 'function') {
+    expressApp.set('trust proxy', 1);
+  }
+
+  // SEC-06: Baseline HTTP Security Headers (Consistent with Nginx SAMEORIGIN)
   app.use((req: any, res: any, next: () => void) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'self';");
     next();
   });
 

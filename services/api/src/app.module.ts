@@ -14,6 +14,9 @@ import { PackagesModule } from './packages/packages.module.js';
 import { RoutingModule } from './routing/routing.module.js';
 import { BookingsModule } from './bookings/bookings.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
+import { APP_GUARD } from '@nestjs/core';
+import { RateLimitGuard } from './common/guards/rate-limit.guard.js';
+import { TenantOwnershipGuard } from './common/guards/tenant-ownership.guard.js';
 
 @Module({
   imports: [
@@ -32,6 +35,16 @@ import { PaymentsModule } from './payments/payments.module.js';
     PaymentsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: TenantOwnershipGuard,
+    },
+  ],
 })
 export class AppModule {}

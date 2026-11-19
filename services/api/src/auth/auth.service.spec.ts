@@ -83,4 +83,25 @@ describe('AuthService', () => {
 
     expect(result.role).toBe(Role.TRAVELLER);
   });
+
+  it('should prevent self-registering as SUPER_ADMIN', async () => {
+    vi.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+    vi.spyOn(prisma.user, 'create').mockImplementation(async (args: any) => ({
+      id: 'uuid-3',
+      email: args.data.email,
+      password: args.data.password,
+      name: args.data.name,
+      role: args.data.role,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    const result = await service.register({
+      email: 'hacker2@yaatrasangi.com',
+      password: 'secretpassword',
+      role: Role.SUPER_ADMIN,
+    });
+
+    expect(result.role).toBe(Role.TRAVELLER);
+  });
 });

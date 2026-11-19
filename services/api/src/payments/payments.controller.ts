@@ -9,11 +9,13 @@ import {
 import { PaymentsService } from './payments.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
+import { Throttle } from '../common/guards/rate-limit.guard.js';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  @Throttle(10, 60)
   @UseGuards(JwtAuthGuard)
   @Post('create-order')
   async createOrder(
@@ -32,6 +34,7 @@ export class PaymentsController {
     });
   }
 
+  @Throttle(10, 60)
   @UseGuards(JwtAuthGuard)
   @Post('verify')
   async verifyPayment(
@@ -44,6 +47,7 @@ export class PaymentsController {
     return this.paymentsService.verifyPayment(body);
   }
 
+  @Throttle(60, 60)
   @Post('webhook')
   async handleWebhook(
     @Headers('x-razorpay-signature') signature: string,

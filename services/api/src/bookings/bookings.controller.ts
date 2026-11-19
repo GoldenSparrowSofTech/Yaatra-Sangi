@@ -13,8 +13,12 @@ import { BookingExpiryService } from './services/booking-expiry.service.js';
 import { CreateBookingHoldDto } from './dto/create-booking-hold.dto.js';
 import { ConfirmBookingDto } from './dto/confirm-booking.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
+import { Role } from '../auth/enums/role.enum.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { IdempotencyInterceptor } from '../common/idempotency/idempotency.interceptor.js';
+import { RequireOwnership } from '../common/guards/tenant-ownership.guard.js';
 
 @Controller('bookings')
 export class BookingsController {
@@ -50,6 +54,7 @@ export class BookingsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @RequireOwnership({ paramName: 'id' })
   @Get(':id')
   async getBooking(
     @CurrentUser('id') userId: string,
@@ -58,6 +63,8 @@ export class BookingsController {
     return this.bookingsService.getBooking(userId, id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Post('cleanup-expired')
   async triggerExpiryCleanup() {
     const expiredCount = await this.expiryService.cleanupExpiredHolds();
