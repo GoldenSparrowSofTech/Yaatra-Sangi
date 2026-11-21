@@ -15,36 +15,33 @@ import { Throttle } from '../common/guards/rate-limit.guard.js';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  /**
+   * WAVE 1: Customer booking payment order creation disabled per direct-connection marketplace policy.
+   */
   @Throttle(10, 60)
   @UseGuards(JwtAuthGuard)
   @Post('create-order')
   async createOrder(
-    @Body() body: { bookingId: string; amount: number; currency?: string },
+    @Body() body: { bookingId?: string; amount?: number; currency?: string },
     @CurrentUser('id') userId: string,
   ) {
-    if (!body.bookingId || !body.amount) {
-      throw new BadRequestException('bookingId and amount are required');
-    }
-
-    return this.paymentsService.createOrder({
-      bookingId: body.bookingId,
-      amount: body.amount,
-      currency: body.currency || 'INR',
-      notes: { userId },
-    });
+    throw new BadRequestException(
+      'Customer booking payments are disabled. YaatraSangi is a direct-connection marketplace without customer booking checkout.',
+    );
   }
 
+  /**
+   * WAVE 1: Customer booking payment verification disabled per direct-connection marketplace policy.
+   */
   @Throttle(10, 60)
   @UseGuards(JwtAuthGuard)
   @Post('verify')
   async verifyPayment(
-    @Body() body: { orderId: string; paymentId: string; signature: string },
+    @Body() body: { orderId?: string; paymentId?: string; signature?: string },
   ) {
-    if (!body.orderId || !body.paymentId || !body.signature) {
-      throw new BadRequestException('orderId, paymentId, and signature are required');
-    }
-
-    return this.paymentsService.verifyPayment(body);
+    throw new BadRequestException(
+      'Customer booking payment verification is disabled. Transactions are handled directly with providers.',
+    );
   }
 
   @Throttle(60, 60)

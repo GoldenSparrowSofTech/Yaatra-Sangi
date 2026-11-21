@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   ActivityIndicator,
-  Alert,
+  Linking,
 } from 'react-native';
 import { apiFetch } from '../config/api.js';
 import { ApiService } from '../services/api.service.js';
@@ -44,26 +44,13 @@ export const PackagesScreen = () => {
     }
   };
 
-  const handleBookPackage = (pkg: any) => {
-    Alert.alert(
-      'Hold Package Tour',
-      `Hold ${pkg.title} (${pkg.duration}) for ₹${pkg.price}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Hold & Pay',
-          onPress: async () => {
-            const today = new Date().toISOString().split('T')[0];
-            const result = await ApiService.createBookingHold('PACKAGE', pkg.slug || pkg.id.toString(), today);
-            if (result.bookingId) {
-              Alert.alert('Package Reserved! 🌴', `15-minute hold active.\nBooking ID: ${result.bookingId.slice(0, 8)}...`);
-            } else {
-              Alert.alert('Notice', result.error || 'Failed to hold package');
-            }
-          },
-        },
-      ],
-    );
+  const handleCallAgent = (pkg: any) => {
+    Linking.openURL('tel:+919876543210');
+  };
+
+  const handleWhatsAppAgent = (pkg: any) => {
+    const message = encodeURIComponent(`Hello, I want to inquire about the ${pkg.title} tour package.`);
+    Linking.openURL(`whatsapp://send?phone=+919876543210&text=${message}`);
   };
 
   return (
@@ -130,12 +117,20 @@ export const PackagesScreen = () => {
                 }}
               >
                 <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>₹{pkg.price}</Text>
-                <TouchableOpacity
-                  onPress={() => handleBookPackage(pkg)}
-                  style={{ backgroundColor: '#0284c7', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 }}
-                >
-                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Reserve</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  <TouchableOpacity
+                    onPress={() => handleCallAgent(pkg)}
+                    style={{ backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                  >
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 11 }}>📞 Call</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleWhatsAppAgent(pkg)}
+                    style={{ backgroundColor: '#25D366', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                  >
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 11 }}>💬 WhatsApp</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>

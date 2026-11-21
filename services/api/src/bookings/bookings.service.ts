@@ -24,9 +24,22 @@ export class BookingsService {
   ) {}
 
   /**
-   * Concurrency-safe atomic temporary reservation hold
+   * WAVE 1: Customer booking-hold disabled per direct-connection marketplace policy.
    */
   async createHold(
+    userId: string,
+    dto: CreateBookingHoldDto,
+    idempotencyKey?: string,
+  ) {
+    throw new BadRequestException(
+      'Direct-connect marketplace: Customer booking holds are disabled per business policy. Connect directly with the business provider via Call or WhatsApp.',
+    );
+  }
+
+  /**
+   * PRESERVED LEGACY: Internal temporary hold creation logic preserved for historical reference.
+   */
+  async legacyCreateHoldInternal(
     userId: string,
     dto: CreateBookingHoldDto,
     idempotencyKey?: string,
@@ -166,9 +179,18 @@ export class BookingsService {
   }
 
   /**
-   * Confirms a held booking after cryptographic verification of payment
+   * WAVE 1: Customer booking confirmation disabled per direct-connection marketplace policy.
    */
   async confirmBooking(userId: string, dto: ConfirmBookingDto) {
+    throw new BadRequestException(
+      'Direct-connect marketplace: Customer booking checkout is disabled. Bookings, confirmations, and payments are handled directly with providers.',
+    );
+  }
+
+  /**
+   * PRESERVED LEGACY: Internal booking confirmation logic preserved for historical reference.
+   */
+  async legacyConfirmBookingInternal(userId: string, dto: ConfirmBookingDto) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: dto.bookingId },
     });

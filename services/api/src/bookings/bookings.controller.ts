@@ -7,6 +7,7 @@ import {
   Headers,
   UseGuards,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service.js';
 import { BookingExpiryService } from './services/booking-expiry.service.js';
@@ -27,6 +28,9 @@ export class BookingsController {
     private readonly expiryService: BookingExpiryService,
   ) {}
 
+  /**
+   * WAVE 1: Customer booking-hold endpoint disabled per direct-connection marketplace policy.
+   */
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(IdempotencyInterceptor)
   @Post('hold')
@@ -35,16 +39,23 @@ export class BookingsController {
     @Body() dto: CreateBookingHoldDto,
     @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    return this.bookingsService.createHold(userId, dto, idempotencyKey);
+    throw new BadRequestException(
+      'Direct-connect marketplace: Customer booking holds are disabled per business policy. Connect directly with the business provider via Call or WhatsApp.',
+    );
   }
 
+  /**
+   * WAVE 1: Customer booking-confirm endpoint disabled per direct-connection marketplace policy.
+   */
   @UseGuards(JwtAuthGuard)
   @Post('confirm')
   async confirmBooking(
     @CurrentUser('id') userId: string,
     @Body() dto: ConfirmBookingDto,
   ) {
-    return this.bookingsService.confirmBooking(userId, dto);
+    throw new BadRequestException(
+      'Direct-connect marketplace: Customer booking checkout is disabled. Bookings, confirmations, and payments are handled directly with providers.',
+    );
   }
 
   @UseGuards(JwtAuthGuard)

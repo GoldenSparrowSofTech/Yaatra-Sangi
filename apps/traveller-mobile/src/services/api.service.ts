@@ -54,16 +54,13 @@ export const ApiService = {
     }
   },
 
+  /**
+   * @deprecated WAVE 1: Customer booking hold disabled. YaatraSangi is a direct-connect marketplace.
+   */
   async createBookingHold(type: string, resourceId: string, startDate: string, endDate?: string) {
-    try {
-      const res = await apiFetch('/bookings/hold', {
-        method: 'POST',
-        body: JSON.stringify({ type, resourceId, startDate, endDate }),
-      });
-      return res.json();
-    } catch (e: any) {
-      return { error: e?.message };
-    }
+    return {
+      error: 'Customer bookings are handled directly with service providers via Call or WhatsApp per YaatraSangi policy.',
+    };
   },
 
   async login(email: string, pass: string): Promise<User | null> {

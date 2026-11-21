@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   ActivityIndicator,
-  Alert,
+  Linking,
 } from 'react-native';
 import { ApiService } from '../services/api.service.js';
 import { Hotel } from '../types/index.js';
@@ -44,29 +44,13 @@ export const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string })
     }
   };
 
-  const handleBook = async (hotel: Hotel) => {
-    Alert.alert(
-      'Hold Room Reservation',
-      `Create a 15-minute temporary hold for ${hotel.name} at ₹${hotel.price}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Hold & Pay',
-          onPress: async () => {
-            const today = new Date().toISOString().split('T')[0];
-            const result = await ApiService.createBookingHold('HOTEL', hotel.id, today);
-            if (result.bookingId) {
-              Alert.alert(
-                'Reservation Held! 🔒',
-                `Hold active for 15 minutes.\nBooking ID: ${result.bookingId.slice(0, 8)}...\nAmount: ₹${result.totalAmount}`,
-              );
-            } else {
-              Alert.alert('Notice', result.error || 'Failed to hold room');
-            }
-          },
-        },
-      ],
-    );
+  const handleCallHotel = (hotel: Hotel) => {
+    Linking.openURL('tel:+919876543210');
+  };
+
+  const handleWhatsAppHotel = (hotel: Hotel) => {
+    const message = encodeURIComponent(`Hello, I am interested in inquiring about room availability at ${hotel.name}.`);
+    Linking.openURL(`whatsapp://send?phone=+919876543210&text=${message}`);
   };
 
   return (
@@ -151,12 +135,20 @@ export const HotelsScreen = ({ initialSearch = '' }: { initialSearch?: string })
                   ₹{hotel.price}
                   <Text style={{ fontSize: 12, color: '#94a3b8', fontWeight: 'normal' }}> / night</Text>
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleBook(hotel)}
-                  style={{ backgroundColor: '#4f46e5', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}
-                >
-                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Reserve</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    onPress={() => handleCallHotel(hotel)}
+                    style={{ backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 }}
+                  >
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>📞 Call</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleWhatsAppHotel(hotel)}
+                    style={{ backgroundColor: '#25D366', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 }}
+                  >
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>💬 WhatsApp</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>

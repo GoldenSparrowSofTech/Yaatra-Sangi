@@ -8,7 +8,7 @@ import {
   Image,
   ImageBackground,
   ActivityIndicator,
-  Alert,
+  Linking,
 } from 'react-native';
 import { apiFetch } from '../config/api.js';
 import { ApiService } from '../services/api.service.js';
@@ -54,26 +54,13 @@ export const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) =
     }
   };
 
-  const handleBookCab = async (cab: any) => {
-    Alert.alert(
-      'Reserve Cab',
-      `Hold ${cab.name} (${cab.type}) for your journey?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Hold & Pay',
-          onPress: async () => {
-            const today = new Date().toISOString().split('T')[0];
-            const result = await ApiService.createBookingHold('CAB', cab.slug || cab.id.toString(), today);
-            if (result.bookingId) {
-              Alert.alert('Cab Reserved! 🚕', `15-minute hold created.\nBooking ID: ${result.bookingId.slice(0, 8)}...`);
-            } else {
-              Alert.alert('Notice', result.error || 'Failed to hold cab');
-            }
-          },
-        },
-      ],
-    );
+  const handleCallCab = (cab: any) => {
+    Linking.openURL('tel:+919876543210');
+  };
+
+  const handleWhatsAppCab = (cab: any) => {
+    const message = encodeURIComponent(`Hello, I want to inquire about booking ${cab.name} (${cab.type}) for a trip.`);
+    Linking.openURL(`whatsapp://send?phone=+919876543210&text=${message}`);
   };
 
   return (
@@ -167,12 +154,20 @@ export const CabsScreen = ({ initialSearch = '' }: { initialSearch?: string }) =
                     ₹{cab.price}
                     <Text style={{ fontSize: 10, color: '#94a3b8' }}>{cab.perKm ? '/km' : '/trip'}</Text>
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => handleBookCab(cab)}
-                    style={{ backgroundColor: '#4f46e5', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8 }}
-                  >
-                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>Reserve</Text>
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 6 }}>
+                    <TouchableOpacity
+                      onPress={() => handleCallCab(cab)}
+                      style={{ backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                    >
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 11 }}>📞 Call</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleWhatsAppCab(cab)}
+                      style={{ backgroundColor: '#25D366', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                    >
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 11 }}>💬 WhatsApp</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>

@@ -50,32 +50,14 @@ export class PaymentsService {
     const event = eventData.event;
     this.logger.log(`Processing verified payment webhook event: ${event}`);
 
+    // WAVE 1: Customer booking auto-confirmation via payment webhook is disabled.
+    // Bookings and payments occur directly between customer and business partner outside platform.
     if (event === 'payment.captured' || event === 'order.paid') {
       const orderId = eventData.payload?.payment?.entity?.order_id;
       if (orderId) {
-        // Find booking by orderId in details JSON
-        const bookings = await this.prisma.booking.findMany({
-          where: {
-            status: { in: ['HELD', 'PENDING_PAYMENT'] },
-          },
-        });
-
-        const matched = bookings.find((b) => {
-          try {
-            const details = typeof b.details === 'string' ? JSON.parse(b.details) : b.details;
-            return details?.orderId === orderId;
-          } catch {
-            return false;
-          }
-        });
-
-        if (matched) {
-          await this.prisma.booking.update({
-            where: { id: matched.id },
-            data: { status: 'CONFIRMED' },
-          });
-          this.logger.log(`Booking ${matched.id} automatically CONFIRMED via payment webhook`);
-        }
+        this.logger.warn(
+          `Received payment webhook event for order ${orderId}, but customer booking auto-confirmation is disabled per direct-connection marketplace policy.`,
+        );
       }
     }
 
